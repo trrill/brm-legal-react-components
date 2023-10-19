@@ -3,98 +3,118 @@ import ProductGrid from '../../components/grids/ProductGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 
 function App() {
-    const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState(null);
-	const [customers, setCustomers] = useState([]);
-	const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [loading, setLoading] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]); // Initialize as an empty array
+  const [selectedCustomers, setSelectedCustomers] = useState([]); // Initialize as an empty array
+  const [loading, setLoading] = useState(false);
 
-	const initialState = {
-		products: [],    // store the list of products fetched from API
-		filters: {       // store the applied filters
-		  category: [],
-		  customer: []
-		},
-		loading: false,  // track if data is being fetched
-		error: null      // store any error message
-	};
+  const [currentFilter, setCurrentFilter] = useState({
+    productCategories: [],
+    customers: [],
+  });
 
-	// Fetch top-level categories
-	const fetchTopLevelProductCategories = async () => {
-		try {
-			const categoryUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/product_category?post_type=legal_provider&parent=0&hide_empty=true`;
-			const response = await fetch(categoryUrl);
-			const data = await response.json();
-			setCategories(data);
-		} catch (error) {
-			console.error("Error fetching categories: ", error);
-		}
-	};
+  const fetchTopLevelParentTerm = async (termId, taxonomyType) => {
+    const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomyType}/${termId}`;
+    const response = await fetch(apiUrl);
+    const term = await response.json();
+  
+    // If the term has a parent, recursively fetch the parent
+    if (term.parent !== 0) {
+      return fetchTopLevelParentTerm(term.parent, taxonomyType);
+    }
+    return term; // This is the top-level term
+  };
+  
+  const fetchTopLevelTaxonomyTerms = async (taxonomyType, stateSetter) => {
+    try {
+      const url = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomyType}?post_type=legal_provider&parent=0&hide_empty=true`;
+      const response = await fetch(url);
+      const data = await response.json();
+      stateSetter(data);
+    } catch (error) {
+      console.error(`Error fetching ${taxonomyType}: `, error);
+    }
+  };
 
-    useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
-			try {
-				const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/legal_tech_provider`;
-				const response = await fetch(apiUrl);
-				const data = await response.json();
-				
-				setProducts(data);
-				setFilteredProducts(data); // Initially, no filters are applied.
-			} catch (error) {
-				console.error("Error fetching data: ", error);
-			} finally {
-				setLoading(false);
-			}
-		};
-	
-		fetchData();
-	}, []); // Run on mount
+  useEffect(() => {
+    const fetchProviders = async () => {
+      setLoading(true);
+      
+      try {
+        const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/legal_tech_provider`;
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+    
+        // Fetch top-level parent terms for each post
+        const postsWithTopLevelTerms = await Promise.all(data.map(async post => {
+          const productCategoryParents = await Promise.all(post.product_category.map(termId => fetchTopLevelParentTerm(termId, 'product_category')));
+          const customerTypeParents = await Promise.all(post.customer_type.map(termId => fetchTopLevelParentTerm(termId, 'customer_type')));
+          
+          return {
+            ...post,
+            productCategoryParents,
+            customerTypeParents
+          };
+        }));
+    
+        setProducts(postsWithTopLevelTerms);
+        setFilteredProducts(postsWithTopLevelTerms); 
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
 
-	useEffect(() => {
-        // Fetch customers and set the state
-        const fetchCustomers = async () => {
-            try {
-                const customerUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/customer_type?post_type=legal_provider&parent=0&hide_empty=true`;
-                const response = await fetch(customerUrl);
-                const data = await response.json();
-                setCustomers(data);
-            } catch (error) {
-                console.error("Error fetching customers: ", error);
-            }
-        };
+    const fetchTermDetails = async (termIds, taxonomy= 'category' ) => {
+      const termDetails = [];
+    
+      for (const termId of termIds) {
+        if (!termId) {
+          termDetails.push(null); // Handle cases where term ID is missing
+          continue;
+        }
+    
+        try {
+          const termUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomy}/${termId}`; // Replace 'your_taxonomy' with the actual taxonomy name
+          const termResponse = await fetch(termUrl);
+          const termData = await termResponse.json();
+          termDetails.push(termData);
+        } catch (error) {
+          console.error(`Error fetching term details for term ID ${termId}: `, error);
+          termDetails.push(null); // Handle errors gracefully
+        }
+      }
+    
+      return termDetails;
+    };
+    
 
-        fetchTopLevelProductCategories();
-        fetchCustomers();
-    }, []);
-	
+    fetchProviders();
+    fetchTopLevelTaxonomyTerms('product_category', setCategories);
+    fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
+  }, []);
 
-	const handleCategoryChange = (category) => {
-		setSelectedCategory(category);
-		if (category) {
-			setFilteredProducts(products.filter(product => product.category === category));
-		} else {
-			setFilteredProducts(products); // Reset to show all products if no category is selected
-		}
-	};	
+  return (
+    <div className="app">
+      <SidebarFilter
+        categories={categories}
+        selectedCategories={selectedCategories}
+        onSelectCategories={setSelectedCategories}
+        customers={customers}
+        selectedCustomers={selectedCustomers}
+        onSelectCustomers={setSelectedCustomers}
+        currentFilter={currentFilter}
+        setCurrentFilter={setCurrentFilter}
+      />
 
-
-    return (
-        <div className="app">
-            <SidebarFilter
-				categories={categories}
-				customers={customers}
-				selectedCategory={selectedCategory}
-				selectedCustomer={selectedCustomer}
-				onSelectCategory={setSelectedCategory}
-				onSelectCustomer={setSelectedCustomer}
-			/>
-
-            <ProductGrid products={filteredProducts} />
-        </div>
-    );
+      <ProductGrid products={filteredProducts} currentFilter={currentFilter} />
+    </div>
+  );
 }
 
 export default App;
