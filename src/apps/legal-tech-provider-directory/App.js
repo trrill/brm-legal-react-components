@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import ProductGrid from '../../components/grids/ProductGrid';
+import ProductListing from '../../components/grids/ProductListing';
 import SidebarFilter from '../../components/filters/SidebarFilter';
+
+import './App.css';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -12,22 +14,22 @@ function App() {
   const [loading, setLoading] = useState(false);
 
   const [currentFilter, setCurrentFilter] = useState({
-    productCategories: [],
+    categories: [],
     customers: [],
   });
 
-  const fetchTopLevelParentTerm = async (termId, taxonomyType) => {
+  /* const fetchTopLevelParentTerm = async (termId, taxonomyType) => {
     const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomyType}/${termId}`;
     const response = await fetch(apiUrl);
     const term = await response.json();
-  
+
     // If the term has a parent, recursively fetch the parent
     if (term.parent !== 0) {
       return fetchTopLevelParentTerm(term.parent, taxonomyType);
     }
     return term; // This is the top-level term
-  };
-  
+  }; */
+
   const fetchTopLevelTaxonomyTerms = async (taxonomyType, stateSetter) => {
     try {
       const url = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomyType}?post_type=legal_provider&parent=0&hide_empty=true`;
@@ -42,57 +44,18 @@ function App() {
   useEffect(() => {
     const fetchProviders = async () => {
       setLoading(true);
-      
       try {
-        const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/legal_tech_provider`;
+        const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/custom/v1/providers_with_terms`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-    
-        // Fetch top-level parent terms for each post
-        const postsWithTopLevelTerms = await Promise.all(data.map(async post => {
-          const productCategoryParents = await Promise.all(post.product_category.map(termId => fetchTopLevelParentTerm(termId, 'product_category')));
-          const customerTypeParents = await Promise.all(post.customer_type.map(termId => fetchTopLevelParentTerm(termId, 'customer_type')));
-          
-          return {
-            ...post,
-            productCategoryParents,
-            customerTypeParents
-          };
-        }));
-    
-        setProducts(postsWithTopLevelTerms);
-        setFilteredProducts(postsWithTopLevelTerms); 
+        setProducts(data);
+        setFilteredProducts(data);
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
         setLoading(false);
       }
     };
-    
-
-    const fetchTermDetails = async (termIds, taxonomy= 'category' ) => {
-      const termDetails = [];
-    
-      for (const termId of termIds) {
-        if (!termId) {
-          termDetails.push(null); // Handle cases where term ID is missing
-          continue;
-        }
-    
-        try {
-          const termUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomy}/${termId}`; // Replace 'your_taxonomy' with the actual taxonomy name
-          const termResponse = await fetch(termUrl);
-          const termData = await termResponse.json();
-          termDetails.push(termData);
-        } catch (error) {
-          console.error(`Error fetching term details for term ID ${termId}: `, error);
-          termDetails.push(null); // Handle errors gracefully
-        }
-      }
-    
-      return termDetails;
-    };
-    
 
     fetchProviders();
     fetchTopLevelTaxonomyTerms('product_category', setCategories);
@@ -100,7 +63,7 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
+    <div className="app lg:flex mx-auto" id="legal-provider-directory">
       <SidebarFilter
         categories={categories}
         selectedCategories={selectedCategories}
@@ -109,10 +72,12 @@ function App() {
         selectedCustomers={selectedCustomers}
         onSelectCustomers={setSelectedCustomers}
         currentFilter={currentFilter}
-        setCurrentFilter={setCurrentFilter}
+        setCurrentFilter={setCurrentFilter} 
       />
-
-      <ProductGrid products={filteredProducts} currentFilter={currentFilter} />
+      <ProductListing 
+        products={filteredProducts} 
+        currentFilter={currentFilter} 
+      />
     </div>
   );
 }
