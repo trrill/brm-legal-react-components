@@ -18,21 +18,9 @@ function App() {
     customers: [],
   });
 
-  /* const fetchTopLevelParentTerm = async (termId, taxonomyType) => {
-    const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomyType}/${termId}`;
-    const response = await fetch(apiUrl);
-    const term = await response.json();
-
-    // If the term has a parent, recursively fetch the parent
-    if (term.parent !== 0) {
-      return fetchTopLevelParentTerm(term.parent, taxonomyType);
-    }
-    return term; // This is the top-level term
-  }; */
-
   const fetchTopLevelTaxonomyTerms = async (taxonomyType, stateSetter) => {
     try {
-      const url = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/wp/v2/${taxonomyType}?post_type=legal_provider&parent=0&hide_empty=true`;
+      const url = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/custom/v1/taxonomy/?taxonomy=${taxonomyType}&post_type=legal_provider&parent=0`;
       const response = await fetch(url);
       const data = await response.json();
       stateSetter(data);
@@ -45,6 +33,7 @@ function App() {
     const fetchProviders = async () => {
       setLoading(true);
       try {
+        console.log('Fetching providers...');
         const apiUrl = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/custom/v1/providers_with_terms`;
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -57,10 +46,13 @@ function App() {
       }
     };
 
-    fetchProviders();
+    if (products.length === 0) {
+      fetchProviders();
+    }
+    
     fetchTopLevelTaxonomyTerms('product_category', setCategories);
     fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
-  }, []);
+  }, [products, ]);
 
   return (
     <div className="app lg:flex mx-auto" id="legal-provider-directory">
