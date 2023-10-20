@@ -5,6 +5,7 @@ function ProductItem({ product, layout }) {
 	const productItemRef = useRef(null);
 	const title = typeof product.post.post_title === 'string' ? product.post.post_title : '';
 	const categoriesReadable = product.categories.map(category => category.slug).join(', ');
+	const description = product.post.post_excerpt!=='' ? product.post.post_excerpt : product.post.post_content;
 	
 	return (
 		<div ref={productItemRef} 
@@ -13,7 +14,7 @@ function ProductItem({ product, layout }) {
 				categories={categoriesReadable} 		
 				customers={product.customers}
 			>
-			<div className='product-item-data text-left flex flex-col justify-center px-4 py-2'>
+			<div className='product-item-data text-left flex flex-col justify-center pl-4 pr-6 py-2'>
 				<h2 className='text-lg '>
 					<a 
 						href={product.post.guid} 
@@ -22,9 +23,11 @@ function ProductItem({ product, layout }) {
 							{title}
 					</a>
 				</h2>
-				<p className="lg:mt-2">
-						{ product.post.post_excerpt!=='' ? product.post.post_excerpt : product.post.post_content }
-				</p>
+				{description && (
+					<p className="lg:mt-2">
+						{description}
+					</p>
+				)}
 			</div>
 			<a 
 				href={product.post.guid} 

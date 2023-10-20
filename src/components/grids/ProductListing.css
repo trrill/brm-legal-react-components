@@ -2,6 +2,10 @@
 	transition: all 0.3s ease-in-out;
 }	
 
+#listing-layout-toggle .opacity-1 svg {
+	fill: #ff1b6b
+}
+
 .product-listing.listing-layout-grid .product-item {
 	width: calc(25% - 1rem)
 }

@@ -46,24 +46,24 @@ function ProductListing({ products, currentFilter }) {
 
   return (
     <div className='lg:w-3/4 px-2 lg:pl-4'>
-      <div className='flex items-center'>
+      <div className='flex items-center mb-4'>
         <div>
           <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Results</h2>
           <p className='text-sm text-gray-400'>{filteredProducts.length} results</p>
         </div>
-        <div id="listing-layout-toggle" className='ml-auto flex'>
+        <div id="listing-layout-toggle" className='ml-auto flex items-center'>
           <span 
-            className={`mr-2 cursor-pointer ${layout === 'grid' ? 'opacity-1' : 'opacity-50 hover:opacity-70'}`} 
+            className={`mr-2 cursor-pointer ${layout === 'grid' ? 'opacity-1' : 'opacity-50 hover:opacity-80'}`} 
             onClick={() => setLayout('grid')}
             >
-              <GridIcon />
+              <GridIcon style={{width: '32px', height: '32px'}} />
           </span>
           |
           <span 
-            className={`ml-2 cursor-pointer ${layout === 'list' ? 'opacity-1' : 'opacity-70 hover:opacity-80'}`}
+            className={`ml-2 cursor-pointer ${layout === 'list' ? 'opacity-1' : 'opacity-50 hover:opacity-80'}`}
             onClick={() => setLayout('list')}
             >
-            <ListIcon />
+            <ListIcon style={{width: '32px', height: '32px'}} />
           </span>
         </div>
 
