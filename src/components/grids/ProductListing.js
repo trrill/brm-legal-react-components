@@ -4,8 +4,15 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ReactComponent as GridIcon } from '../../assets/svg/view_module_black_24dp.svg';
 import { ReactComponent as ListIcon } from '../../assets/svg/view_list_black_24dp.svg';
 
+import './ProductListing.css';
+
 function ProductListing({ products, currentFilter }) {
   const [layout, setLayout] = useState('grid');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
 
   const filteredProducts = products.filter((product) => {
     const productCategories = product.categories || {};
@@ -24,8 +31,17 @@ function ProductListing({ products, currentFilter }) {
     const matchesCustomers =
       selectedCustomers.length === 0 ||
       customerSlugs.some((slug) => selectedCustomers.includes(slug));
+    
+    const matchesSearch =
+      searchTerm === '' ||
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      categorySlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      customerSlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    return matchesCategories && matchesCustomers;
+
+    return matchesCategories && matchesCustomers && matchesSearch;
   });
 
   return (
@@ -53,19 +69,18 @@ function ProductListing({ products, currentFilter }) {
 
       </div>
    
-        <TransitionGroup 
-          className={`product-listing flex-wrap ${layout === 'grid' ? 'flex' : 'flex-col'} listing-layout-${layout}`}>
-            {filteredProducts.map((product) => (
-                <CSSTransition
-                    key={product.post.ID}
-                    timeout={500}
-                    classNames="product-item-transition"
-                >
-                    <ProductItem product={product} layout={layout} />
-                </CSSTransition>
-            ))}
-        </TransitionGroup>
-      
+      <TransitionGroup 
+        className={`product-listing flex-wrap gap-2 ${layout === 'grid' ? 'flex' : 'flex-col'} listing-layout-${layout}`}>
+          {filteredProducts.map((product) => (
+              <CSSTransition
+                  key={product.post.ID}
+                  timeout={500}
+                  classNames="product-item-transition"
+              >
+                  <ProductItem product={product} layout={layout} />
+              </CSSTransition>
+          ))}
+      </TransitionGroup>
     </div>
   );
 }

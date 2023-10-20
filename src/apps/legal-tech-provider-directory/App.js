@@ -12,6 +12,7 @@ function App() {
   const [selectedCategories, setSelectedCategories] = useState([]); // Initialize as an empty array
   const [selectedCustomers, setSelectedCustomers] = useState([]); // Initialize as an empty array
   const [loading, setLoading] = useState(false);
+  
 
   const [currentFilter, setCurrentFilter] = useState({
     categories: [],
@@ -20,13 +21,35 @@ function App() {
 
   const fetchTopLevelTaxonomyTerms = async (taxonomyType, stateSetter) => {
     try {
-      const url = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/custom/v1/taxonomy/?taxonomy=${taxonomyType}&post_type=legal_provider&parent=0`;
+      const url = `${process.env.REACT_APP_ATL_LIC_BASE_URL}/wp-json/custom/v1/taxonomy/?taxonomy=${taxonomyType}&post_type=legal_provider`;
       const response = await fetch(url);
       const data = await response.json();
       stateSetter(data);
     } catch (error) {
       console.error(`Error fetching ${taxonomyType}: `, error);
     }
+  };
+
+  const handleSearch = (searchTerm) => {
+    // Update the filteredProducts based on the search term
+
+    const filtered = products.filter((product) => {
+      // Check if the product title, excerpt, content, or categories/customers match the search term
+      return (
+        product.post.post_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.post.post_excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.post.post_content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.categories.some((category) =>
+          category.name.toLowerCase().includes(searchTerm.toLowerCase())
+        ) ||
+        product.customers.some((customer) =>
+          customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    });
+
+    // Set the filtered products in the state
+    setFilteredProducts(filtered);
   };
 
   useEffect(() => {
@@ -55,21 +78,27 @@ function App() {
   }, [products, ]);
 
   return (
-    <div className="app lg:flex mx-auto" id="legal-provider-directory">
-      <SidebarFilter
-        categories={categories}
-        selectedCategories={selectedCategories}
-        onSelectCategories={setSelectedCategories}
-        customers={customers}
-        selectedCustomers={selectedCustomers}
-        onSelectCustomers={setSelectedCustomers}
-        currentFilter={currentFilter}
-        setCurrentFilter={setCurrentFilter} 
-      />
-      <ProductListing 
-        products={filteredProducts} 
-        currentFilter={currentFilter} 
-      />
+    <div className="app" id="legal-provider-directory">
+      <h1 className="uppercase text-white text-mono text-5xl text-center p-4 pt-5 m-0 mb-4 gradient-title">
+        Legal Tech Directory
+      </h1>
+      <div className="lg:flex mx-auto">
+        <SidebarFilter
+          categories={categories}
+          selectedCategories={selectedCategories}
+          onSelectCategories={setSelectedCategories}
+          customers={customers}
+          selectedCustomers={selectedCustomers}
+          onSelectCustomers={setSelectedCustomers}
+          currentFilter={currentFilter}
+          setCurrentFilter={setCurrentFilter} 
+          onSearch={handleSearch}
+        />
+        <ProductListing 
+          products={filteredProducts} 
+          currentFilter={currentFilter} 
+        />
+      </div>
     </div>
   );
 }

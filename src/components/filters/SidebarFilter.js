@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 
 function SidebarFilter({
   categories,
@@ -9,8 +9,18 @@ function SidebarFilter({
   onSelectCustomers,
   currentFilter,
   setCurrentFilter,
+  onSearch
 }) {
   const currentFilterReadable = JSON.stringify(currentFilter, null, 2);
+
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+    
+    // Call the search function with the updated search term
+    onSearch(event.target.value);
+  };
 
   const toggleCategory = (categorySlug) => {
     const updatedCategories = selectedCategories.includes(categorySlug)
@@ -42,6 +52,33 @@ function SidebarFilter({
 
   return (
     <div className="filter-sidebar lg:w-1/4 px-2 lg:pr-4">
+
+      <h2 className='uppercase text-sm uppercase text-gray tracking-wider pb-1 mb-4 border-b border-black'>
+        Search by keyword
+      </h2>
+      <div className="items-center justify-between mb-4 relative">
+        <input
+          type="text"
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="w-full border p-2 mb-4"
+        />
+        
+        {searchTerm && ( // Show the "X" icon only if searchTerm has a value
+          <span 
+            className="absolute top-50 transform -translate-y-50 right-2 cursor-pointer text-3xl text-gray-400 hover:text-black p-1"
+            onClick={() => {
+              setSearchTerm(''); // Clear the search term
+              onSearch(''); // Update filtered results
+            }}
+          >
+            &times;
+          </span>
+        )}
+      </div>
+
+
       <div className='pb-1 mb-4 border-b border-black flex items-center justify-between'>
         <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Filter by</h2>
         <span

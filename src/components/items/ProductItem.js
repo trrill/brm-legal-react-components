@@ -8,12 +8,12 @@ function ProductItem({ product, layout }) {
 	
 	return (
 		<div ref={productItemRef} 
-			className={`product-item lg:text-center p-2 mb-2 lg:grayscale hover:grayscale-0 lg:rounded-lg lg:shadow-lg ${layout === 'grid' ? 'lg:w-1/4' : 'flex justify-between'}`} 
+			className={`product-item lg:text-center p-2 mb-2 lg:grayscale hover:grayscale-0 lg:rounded-lg lg:shadow-lg ${layout === 'grid' ? '' : 'flex justify-between'}`} 
 				key={product.id} 
 				categories={categoriesReadable} 		
 				customers={product.customers}
 			>
-			<div className='product-item-data text-left flex flex-col justify-center pr-4'>
+			<div className='product-item-data text-left flex flex-col justify-center px-4 py-2'>
 				<h2 className='text-lg '>
 					<a 
 						href={product.post.guid} 

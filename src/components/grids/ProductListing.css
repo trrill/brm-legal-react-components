@@ -1,0 +1,11 @@
+#listing-layout-toggle span {
+	transition: all 0.3s ease-in-out;
+}	
+
+.product-listing.listing-layout-grid .product-item {
+	width: calc(25% - 1rem)
+}
+
+.product-listing.listing-layout-grid .product-item-data {
+	display: none;
+}	
