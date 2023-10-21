@@ -2,6 +2,14 @@
 	font-family: ocr-a-std, monospace;
 }
 
+.border-blue {
+	border-color: #59b5f1;
+}
+
+.bg-blue {
+	background-color: #59b5f1;
+}
+
 .gradient-title {
 	text-shadow: 1px 2px 4px rgba(33,1,65,.5); 
 	background: #1e5799; 
@@ -28,6 +36,5 @@
 }
 	.filter-sidebar input[type="checkbox"]:checked {
 		background-color: #59b5f1;
-		
 	}
 

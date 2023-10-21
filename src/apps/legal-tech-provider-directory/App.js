@@ -82,7 +82,7 @@ function App() {
       <h1 className="uppercase text-white text-mono text-5xl text-center p-4 pt-5 m-0 mb-4 gradient-title">
         Legal Tech Directory
       </h1>
-      <div className="lg:flex mx-auto">
+      <div className="md:flex mx-auto">
         <SidebarFilter
           categories={categories}
           selectedCategories={selectedCategories}

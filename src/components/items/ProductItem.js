@@ -9,7 +9,7 @@ function ProductItem({ product, layout }) {
 	
 	return (
 		<div ref={productItemRef} 
-			className={`product-item lg:text-center p-2 mb-2 lg:grayscale hover:grayscale-0 lg:rounded-lg lg:shadow-lg ${layout === 'grid' ? '' : 'flex justify-between'}`} 
+			className={`product-item md:text-center p-2 mb-2  hover:grayscale-0 md:rounded-lg md:shadow-lg ${layout === 'grid' ? '' : 'flex justify-between'}`} 
 				key={product.id} 
 				categories={categoriesReadable} 		
 				customers={product.customers}
@@ -24,7 +24,7 @@ function ProductItem({ product, layout }) {
 					</a>
 				</h2>
 				{description && (
-					<p className="lg:mt-2">
+					<p className="md:mt-2">
 						{description}
 					</p>
 				)}
@@ -32,9 +32,9 @@ function ProductItem({ product, layout }) {
 			<a 
 				href={product.post.guid} 
 				title={`Learn more about ${title}`}
-				className={`lg:block lg:h-full lg:overflow-hidden ${layout === 'list' ? 'w-1/5' : ''}`}
+				className={`md:block md:h-full md:overflow-hidden ${layout === 'list' ? 'w-1/5' : ''}`}
 				>
-					<img src={product.featured_image_url} className='lg:w-full lg:h-full lg:object-contain' alt={title} />
+					<img src={product.featured_image_url} className='md:w-full md:h-full md:object-contain' alt={title} />
 			</a>
 			
 		</div>

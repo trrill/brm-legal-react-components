@@ -45,7 +45,7 @@ function ProductListing({ products, currentFilter }) {
   });
 
   return (
-    <div className='lg:w-3/4 px-2 lg:pl-4'>
+    <div className='md:w-3/4 px-2 md:pl-4'>
       <div className='flex items-center mb-4'>
         <div>
           <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Results</h2>

@@ -1,0 +1,27 @@
+.filter-base,
+.filter-settings-icon {
+	transition: all 0.2s ease-in-out;
+}
+
+.filter-icon.bg-blue svg {
+	fill: #fff;
+}
+
+.filter-settings-icon:hover {
+	opacity: 1;
+}
+.filter-settings-icon:hover svg {
+	fill: #59b5f1;
+}
+
+.search-focused .filter-settings-icon {
+	opacity: 1;
+	background: #59b5f1;
+}
+.search-focused .filter-settings-icon svg {
+	fill: #fff;
+}
+
+.search-focused .filter-settings-icon:hover svg {
+	fill: #fff;
+}
