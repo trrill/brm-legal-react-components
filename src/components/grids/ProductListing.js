@@ -8,11 +8,7 @@ import './ProductListing.css';
 
 function ProductListing({ products, currentFilter }) {
   const [layout, setLayout] = useState('grid');
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-  };
+  const [searchTerm] = useState('');
 
   const filteredProducts = products.filter((product) => {
     const productCategories = product.categories || {};
@@ -68,7 +64,7 @@ function ProductListing({ products, currentFilter }) {
 
 
   return (
-    <div className='md:w-3/4 px-2 md:pl-4'>
+    <div className='md:w-3/4 px-2 md:pl-4 mt-6 md:mt-0'>
       <div className='flex items-center mb-4'>
         <div>
           <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Providers</h2>
@@ -76,14 +72,14 @@ function ProductListing({ products, currentFilter }) {
         </div>
         <div id="listing-layout-toggle" className='hidden md:flex ml-auto items-center'>
           <span 
-            className={`mr-2 cursor-pointer ${layout === 'grid' ? 'opacity-1' : 'opacity-50 hover:opacity-80'}`} 
+            className={`mr-2 cursor-pointer ${layout === 'grid' ? 'opacity-1' : 'opacity-40 hover:opacity-70'}`} 
             onClick={() => setLayout('grid')}
             >
               <GridIcon style={{width: '32px', height: '32px'}} />
           </span>
           |
           <span 
-            className={`ml-2 cursor-pointer ${layout === 'list' ? 'opacity-1' : 'opacity-50 hover:opacity-80'}`}
+            className={`ml-2 cursor-pointer ${layout === 'list' ? 'opacity-1' : 'opacity-40 hover:opacity-70'}`}
             onClick={() => setLayout('list')}
             >
             <ListIcon style={{width: '32px', height: '32px'}} />

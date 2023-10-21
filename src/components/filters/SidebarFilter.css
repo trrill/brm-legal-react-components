@@ -15,17 +15,17 @@
 }
 
 .search-focused .filter-more-icon,
-.filter-more-icon.filter-more-active {
+.filter-more-active .filter-more-icon {
 	opacity: 1;
 	background: #59b5f1;
 }
 
-.filter-more-icon.filter-more-active svg,
+.filter-more-active .filter-more-icon svg,
 .search-focused .filter-more-icon svg {
 	fill: #fff;
 }
 
-.filter-more-icon.filter-more-active:hover svg,
+.filter-more-active .filter-more-icon:hover svg,
 .search-focused .filter-more-icon:hover svg {
 	fill: #fff;
 }

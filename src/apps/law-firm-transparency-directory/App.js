@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ProductListing from '../../components/grids/ProductListing';
 import SidebarFilter from '../../components/filters/SidebarFilter';
-import './tailwind-output.css';
+
 import './App.css';
 
 function App() {
@@ -13,28 +13,11 @@ function App() {
   const [selectedCustomers, setSelectedCustomers] = useState([]); // Initialize as an empty array
   //const [loading, setLoading] = useState(false);
   
+
   const [currentFilter, setCurrentFilter] = useState({
     categories: [],
     customers: [],
   });
-
-  const isDevelopment = window.location.hostname === "dev.abovethelaw.com" || window.location.hostname === "localhost";
-
-  const apiBasePoint = isDevelopment 
-    ? 'http://dev.abovethelaw.com/legal-innovation-center'
-    : 'https://abovethelaw.com/legal-innovation-center';
-
-
-  const fetchTopLevelTaxonomyTerms = async (taxonomyType, stateSetter) => {
-    try {
-      const url = `${apiBasePoint}/wp-json/custom/v1/taxonomy/?taxonomy=${taxonomyType}&post_type=legal_provider`;
-      const response = await fetch(url);
-      const data = await response.json();
-      stateSetter(data);
-    } catch (error) {
-      console.error(`Error fetching ${taxonomyType}: `, error);
-    }
-  };
 
   const handleSearch = (searchTerm) => {
     // Update the filteredProducts based on the search term
@@ -59,11 +42,11 @@ function App() {
   };
 
   useEffect(() => {
-    const fetchProviders = async () => {
-      //setLoading(true);
+    const fetchTransparencyFirms = async () => {
+      setLoading(true);
       try {
         console.log('Fetching providers...');
-        const apiUrl = `${apiBasePoint}/wp-json/custom/v1/providers_with_terms`;
+        const apiUrl = `${process.env.REACT_APP_ATL_BASE_URL}/wp-json/custom/v1/transparency_firms_with_terms`;
         const response = await fetch(apiUrl);
         const data = await response.json();
         setProducts(data);
@@ -71,20 +54,20 @@ function App() {
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 
     if (products.length === 0) {
-      fetchProviders();
+      fetchTransparencyFirms();
     }
     
-    fetchTopLevelTaxonomyTerms('product_category', setCategories);
-    fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
-  }, [products, apiBasePoint, fetchTopLevelTaxonomyTerms]);
+    //fetchTopLevelTaxonomyTerms('product_category', setCategories);
+    //fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
+  }, [products, ]);
 
   return (
-    <div className="app bg-gray-100" id="legal-provider-directory">
+    <div className="app" id="legal-provider-directory">
       <h1 className="uppercase text-white text-mono text-5xl text-center p-4 pt-5 m-0 mb-4 gradient-title">
         Legal Tech Directory
       </h1>
