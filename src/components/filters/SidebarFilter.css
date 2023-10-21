@@ -1,5 +1,5 @@
 .filter-base,
-.filter-settings-icon {
+.filter-more-icon {
 	transition: all 0.2s ease-in-out;
 }
 
@@ -7,21 +7,25 @@
 	fill: #fff;
 }
 
-.filter-settings-icon:hover {
+.filter-more-icon:hover {
 	opacity: 1;
 }
-.filter-settings-icon:hover svg {
+.filter-more-icon:hover svg {
 	fill: #59b5f1;
 }
 
-.search-focused .filter-settings-icon {
+.search-focused .filter-more-icon,
+.filter-more-icon.filter-more-active {
 	opacity: 1;
 	background: #59b5f1;
 }
-.search-focused .filter-settings-icon svg {
+
+.filter-more-icon.filter-more-active svg,
+.search-focused .filter-more-icon svg {
 	fill: #fff;
 }
 
-.search-focused .filter-settings-icon:hover svg {
+.filter-more-icon.filter-more-active:hover svg,
+.search-focused .filter-more-icon:hover svg {
 	fill: #fff;
 }

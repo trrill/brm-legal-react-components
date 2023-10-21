@@ -18,7 +18,8 @@
   "scripts": {
     "start:legal-tech": "react-scripts start src/apps/legal-tech-provider-directory/index.js",
     "build:legal-tech": "react-scripts build src/apps/legal-tech-provider-directory/index.js && mv build/static/js/main.*.js build/static/js/legalTechProviderDirectory.js",
-    "rename:legal-tech": "mv build/static/js/main.*.js build/static/js/legalTechProviderDirectory.js"
+    "start:transparency": "react-scripts start src/apps/law-firm-transparency-directory/index.js",
+    "build:transparency": "react-scripts build src/apps/law-firm-transparency-directory/index.js && mv build/static/js/main.*.js build/static/js/lawFirmTransparencyDirectory.js"
   },
   "eslintConfig": {
     "extends": [

@@ -14,10 +14,10 @@ function SidebarFilter({
   setCurrentFilter,
   onSearch
 }) {
-  const currentFilterReadable = JSON.stringify(currentFilter, null, 2);
-
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isMoreFilterActive, setIsMoreFilterActive] = useState(false);
 
   const handleInputFocus = () => {
     setIsSearchFocused(true);
@@ -27,6 +27,10 @@ function SidebarFilter({
   const handleInputBlur = () => {
     setIsSearchFocused(false);
     console.log('blur');
+  };
+
+  const handleMoreFilterClick = () => {
+    setIsMoreFilterActive((prev) => !prev);
   };
 
   const handleSearchChange = (event) => {
@@ -66,7 +70,7 @@ function SidebarFilter({
 
   return (
     <div className="filter-sidebar md:w-1/4 px-2 md:pr-4">
-      <div className={`filter-base flex md:block items-center justify-between mb-4 border-2 md:border-0 ${isSearchFocused ? 'border-blue search-focused' : 'border-gray-200'}`}>
+      <div className={`filter-base flex md:block items-center justify-between mb-6 md:mb-4 border-2 md:border-0 ${isSearchFocused ? 'border-blue search-focused' : 'border-gray-200'}`}>
         <div className='filter-search-icon md:hidden flex-none p-2 opacity-40'>
           <SearchIcon style={{width: '32px', height: '32px'}} />
         </div>
@@ -96,11 +100,14 @@ function SidebarFilter({
             </span>
           )}
         </div>
-        <div className={`filter-settings-icon md:hidden flex-none p-2 cursor-pointer`}>
+        <div 
+          className={`filter-more-icon md:hidden flex-none p-2 cursor-pointer ${isMoreFilterActive ? 'filter-more-active' : ''}`}
+          onClick={handleMoreFilterClick}
+        >
           <FilterIcon style={{width: '32px', height: '32px'}} />
         </div>
       </div>
-      <div className="filter-more hidden md:block">
+      <div className={`filter-more md:block ${ ! isMoreFilterActive ? 'hidden' : ''}`}>
         <div className='pb-1 mb-4 border-b border-black flex items-center justify-between'>
           <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Filter by</h2>
           <span
@@ -178,9 +185,6 @@ function SidebarFilter({
           ))}
         </ul>
       </div>
-      <pre style={{fontSize: '0.75rem'}}>
-        {currentFilterReadable}
-      </pre>
     </div>
   );
 }

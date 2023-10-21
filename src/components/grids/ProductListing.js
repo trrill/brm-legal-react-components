@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ProductItem from '../items/ProductItem';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ReactComponent as GridIcon } from '../../assets/svg/view_module_black_24dp.svg';
@@ -44,14 +44,37 @@ function ProductListing({ products, currentFilter }) {
     return matchesCategories && matchesCustomers && matchesSearch;
   });
 
+  useEffect(() => {
+    // Function to handle viewport width changes
+    const handleViewportChange = () => {
+      if (window.innerWidth < 768) {
+        setLayout('list');
+      } else {
+        setLayout('grid');
+      }
+    };
+
+    // Set initial layout based on viewport width
+    handleViewportChange();
+
+    // Add a window resize event listener to update layout on resize
+    window.addEventListener('resize', handleViewportChange);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('resize', handleViewportChange);
+    };
+  }, []); // Empty dependency array ensures this effect runs once on mount
+
+
   return (
     <div className='md:w-3/4 px-2 md:pl-4'>
       <div className='flex items-center mb-4'>
         <div>
-          <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Results</h2>
+          <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Providers</h2>
           <p className='text-sm text-gray-400'>{filteredProducts.length} results</p>
         </div>
-        <div id="listing-layout-toggle" className='ml-auto flex items-center'>
+        <div id="listing-layout-toggle" className='hidden md:flex ml-auto items-center'>
           <span 
             className={`mr-2 cursor-pointer ${layout === 'grid' ? 'opacity-1' : 'opacity-50 hover:opacity-80'}`} 
             onClick={() => setLayout('grid')}
