@@ -24,6 +24,7 @@
 
 #legal-provider-directory {
 	font-family: proxima-nova, sans-serif;
+	min-height: 100vh;
 }
 
 .filter-sidebar input[type="checkbox"] {

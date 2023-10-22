@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ProductListing from '../../components/grids/ProductListing';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 import './tailwind-output.css';
@@ -9,8 +9,8 @@ function App() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [customers, setCustomers] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]); // Initialize as an empty array
-  const [selectedCustomers, setSelectedCustomers] = useState([]); // Initialize as an empty array
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedCustomers, setSelectedCustomers] = useState([]);
   //const [loading, setLoading] = useState(false);
   
   const [currentFilter, setCurrentFilter] = useState({
@@ -24,8 +24,9 @@ function App() {
     ? 'http://dev.abovethelaw.com/legal-innovation-center'
     : 'https://abovethelaw.com/legal-innovation-center';
 
+  const fetchedProductsRef = useRef(false);
 
-  const fetchTopLevelTaxonomyTerms = async (taxonomyType, stateSetter) => {
+  const fetchTopLevelTaxonomyTerms = useCallback(async (taxonomyType, stateSetter) => {
     try {
       const url = `${apiBasePoint}/wp-json/custom/v1/taxonomy/?taxonomy=${taxonomyType}&post_type=legal_provider`;
       const response = await fetch(url);
@@ -34,7 +35,7 @@ function App() {
     } catch (error) {
       console.error(`Error fetching ${taxonomyType}: `, error);
     }
-  };
+  }, [apiBasePoint]);
 
   const handleSearch = (searchTerm) => {
     // Update the filteredProducts based on the search term
@@ -75,13 +76,17 @@ function App() {
       }
     };
 
-    if (products.length === 0) {
+    if ( ! fetchedProductsRef.current) {
       fetchProviders();
+      fetchedProductsRef.current = true;
     }
     
+  }, [products, apiBasePoint]);
+
+  useEffect(() => {
     fetchTopLevelTaxonomyTerms('product_category', setCategories);
     fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
-  }, [products, apiBasePoint, fetchTopLevelTaxonomyTerms]);
+  }, [fetchTopLevelTaxonomyTerms]);
 
   return (
     <div className="app bg-gray-100" id="legal-provider-directory">

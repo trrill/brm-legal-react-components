@@ -67,7 +67,6 @@ function SidebarFilter({
   };
 
   useEffect(() => {
-    // Function to handle viewport width changes
     const handleViewportChange = () => {
       if (window.innerWidth < 768) {
         setIsMoreFilterActive(false);
@@ -79,14 +78,13 @@ function SidebarFilter({
     // Set initial layout based on viewport width
     handleViewportChange();
 
-    // Add a window resize event listener to update layout on resize
     window.addEventListener('resize', handleViewportChange);
 
     // Clean up the event listener when the component unmounts
     return () => {
       window.removeEventListener('resize', handleViewportChange);
     };
-  }, []); // Empty dependency array ensures this effect runs once on mount
+  }, []); // Runs once on mount
 
 
   return (

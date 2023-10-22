@@ -10,6 +10,8 @@ function ProductListing({ products, currentFilter }) {
   const [layout, setLayout] = useState('grid');
   const [searchTerm] = useState('');
 
+  const productRefs = React.useRef({});
+
   const filteredProducts = products.filter((product) => {
     const productCategories = product.categories || {};
     const productCustomers = product.customers || {};
@@ -27,7 +29,7 @@ function ProductListing({ products, currentFilter }) {
     const matchesCustomers =
       selectedCustomers.length === 0 ||
       customerSlugs.some((slug) => selectedCustomers.includes(slug));
-    
+
     const matchesSearch =
       searchTerm === '' ||
       product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -40,8 +42,16 @@ function ProductListing({ products, currentFilter }) {
     return matchesCategories && matchesCustomers && matchesSearch;
   });
 
+
+  // Directly initialize the refs for the current set of filtered products, i.e. all of em
+  filteredProducts.forEach(product => {
+    if (!productRefs.current[product.post.ID]) {
+      productRefs.current[product.post.ID] = React.createRef();
+    }
+  });
+
+
   useEffect(() => {
-    // Function to handle viewport width changes
     const handleViewportChange = () => {
       if (window.innerWidth < 768) {
         setLayout('list');
@@ -53,14 +63,13 @@ function ProductListing({ products, currentFilter }) {
     // Set initial layout based on viewport width
     handleViewportChange();
 
-    // Add a window resize event listener to update layout on resize
     window.addEventListener('resize', handleViewportChange);
 
     // Clean up the event listener when the component unmounts
     return () => {
       window.removeEventListener('resize', handleViewportChange);
     };
-  }, []); // Empty dependency array ensures this effect runs once on mount
+  }, []); // Run once on mount
 
 
   return (
@@ -71,34 +80,40 @@ function ProductListing({ products, currentFilter }) {
           <p className='text-sm text-gray-400'>{filteredProducts.length} results</p>
         </div>
         <div id="listing-layout-toggle" className='hidden md:flex ml-auto items-center'>
-          <span 
-            className={`mr-2 cursor-pointer ${layout === 'grid' ? 'opacity-1' : 'opacity-40 hover:opacity-70'}`} 
+          <span
+            className={`mr-2 cursor-pointer ${layout === 'grid' ? 'opacity-1' : 'opacity-40 hover:opacity-70'}`}
             onClick={() => setLayout('grid')}
-            >
-              <GridIcon style={{width: '32px', height: '32px'}} />
+          >
+            <GridIcon style={{ width: '32px', height: '32px' }} />
           </span>
           |
-          <span 
+          <span
             className={`ml-2 cursor-pointer ${layout === 'list' ? 'opacity-1' : 'opacity-40 hover:opacity-70'}`}
             onClick={() => setLayout('list')}
-            >
-            <ListIcon style={{width: '32px', height: '32px'}} />
+          >
+            <ListIcon style={{ width: '32px', height: '32px' }} />
           </span>
         </div>
 
       </div>
-   
-      <TransitionGroup 
-        className={`product-listing flex-wrap gap-2 ${layout === 'grid' ? 'flex' : 'flex-col'} listing-layout-${layout}`}>
-          {filteredProducts.map((product) => (
-              <CSSTransition
-                  key={product.post.ID}
-                  timeout={500}
-                  classNames="product-item-transition"
-              >
-                  <ProductItem product={product} layout={layout} />
-              </CSSTransition>
-          ))}
+
+      <TransitionGroup
+        className={`product-listing flex-wrap gap-2 ${layout === 'grid' ? 'flex' : 'flex-col'} listing-layout-${layout}`}
+      >
+        {filteredProducts.map((product) => {
+          const ref = productRefs.current[product.post.ID];
+
+          return (
+            <CSSTransition
+              timeout={500}
+              classNames="product-item-transition"
+              key={product.post.ID}
+              nodeRef={ref}
+            >
+              <ProductItem ref={ref} product={product} layout={layout} />
+            </CSSTransition>
+          );
+        })}
       </TransitionGroup>
     </div>
   );
