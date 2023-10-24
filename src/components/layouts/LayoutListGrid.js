@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import ProductItem from '../items/ProductItem';
+import LayoutListItem from '../items/LayoutListItem';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ReactComponent as GridIcon } from '../../assets/svg/view_module_black_24dp.svg';
 import { ReactComponent as ListIcon } from '../../assets/svg/view_list_black_24dp.svg';
 
-import './ProductListing.css';
+import './LayoutListGrid.css';
 
-function ProductListing({ products, currentFilter }) {
+function LayoutListGrid({ products, currentFilter }) {
   const [layout, setLayout] = useState('grid');
   const [searchTerm] = useState('');
 
@@ -16,8 +16,8 @@ function ProductListing({ products, currentFilter }) {
     const productCategories = product.categories || {};
     const productCustomers = product.customers || {};
 
-    const categorySlugs = Object.values(productCategories).map((category) => category.slug);
-    const customerSlugs = Object.values(productCustomers).map((customer) => customer.slug);
+    const categorySlugs = (productCategories) ? Object.values(productCategories).map((category) => category.slug): [];
+    const customerSlugs = (productCustomers) ? Object.values(productCustomers).map((customer) => customer.slug): [];
 
     const selectedCategories = Object.values(currentFilter.categories || {});
     const selectedCustomers = Object.values(currentFilter.customers || {});
@@ -110,7 +110,7 @@ function ProductListing({ products, currentFilter }) {
               key={product.post.ID}
               nodeRef={ref}
             >
-              <ProductItem ref={ref} product={product} layout={layout} />
+              <LayoutListItem ref={ref} product={product} layout={layout} />
             </CSSTransition>
           );
         })}
@@ -119,4 +119,4 @@ function ProductListing({ products, currentFilter }) {
   );
 }
 
-export default ProductListing;
+export default LayoutListGrid;

@@ -21,12 +21,10 @@
 .product-item {
 	transition: all 0.3s ease-in-out;
 }
-	.product-item:hover h2 a {
-		text-decoration: underline!important;
-	}
 
 #legal-provider-directory {
 	font-family: proxima-nova, sans-serif;
+	min-height: 100vh;
 }
 
 .filter-sidebar input[type="checkbox"] {

@@ -1,9 +1,9 @@
-import React, { useEffect, useCallback } from 'react';
-import './ProductItem.css';
+import React, { useCallback } from 'react';
+import './LayoutListItem.css';
 
-const ProductItem = React.forwardRef(({ product, layout }, ref) => {
+const LayoutListItem = React.forwardRef(({ product, layout }, ref) => {
     const title = typeof product.post.post_title === 'string' ? product.post.post_title : '';
-    const categoriesReadable = product.categories.map(category => category.slug).join(', ');
+    const categoriesReadable = (product.categories) ? product.categories.map(category => category.slug).join(', ') : '';
     const description = product.post.post_excerpt !== '' ? product.post.post_excerpt : product.post.post_content;
 
     const handleItemClick = useCallback(() => {
@@ -11,21 +11,6 @@ const ProductItem = React.forwardRef(({ product, layout }, ref) => {
             window.location = product.post.guid;
         }
     }, [layout, product.post.guid]); 
-
-    /*
-    useEffect(() => {
-        const handleResize = () => {
-            // Here, you can add logic that should run on window resize, if any.
-        };
-        
-        window.addEventListener('resize', handleResize);
-        
-        // Cleanup: Remove the resize event listener when the component unmounts
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-    */
 
     return (
         <div ref={ref} 
@@ -66,4 +51,4 @@ const ProductItem = React.forwardRef(({ product, layout }, ref) => {
     );
 });
 
-export default ProductItem;
+export default LayoutListItem;
