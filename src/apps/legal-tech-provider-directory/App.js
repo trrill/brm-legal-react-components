@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import ProductListing from '../../components/grids/ProductListing';
+import LayoutListGrid from '../../components/layouts/LayoutListGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 import './tailwind-output.css';
 import './App.css';
@@ -105,7 +105,7 @@ function App() {
           setCurrentFilter={setCurrentFilter} 
           onSearch={handleSearch}
         />
-        <ProductListing 
+        <LayoutListGrid 
           products={filteredProducts} 
           currentFilter={currentFilter} 
         />

@@ -21,8 +21,8 @@ function App() {
   const isDevelopment = window.location.hostname === "dev.abovethelaw.com" || window.location.hostname === "localhost";
 
   const apiBasePoint = isDevelopment 
-    ? 'http://dev.abovethelaw.com'
-    : 'https://abovethelaw.com';
+    ? 'http://dev.aldus.abovethelaw.com:3000/wp-api'
+    : 'https://aldus.abovethelaw.com:3000/wp-api';
 
   const fetchedProductsRef = useRef(false);
 
@@ -63,7 +63,7 @@ function App() {
     const fetchFirms = async () => {
       //setLoading(true);
       try {
-        console.log('Fetching providers...');
+        console.log('Fetching firms...');
         const apiUrl = `${apiBasePoint}/wp-json/custom/v1/transparency_firms_data`;
         const response = await fetch(apiUrl);
         const data = await response.json();
