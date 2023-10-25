@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './SidebarFilter.css';
+import FilterGroup from './FilterGroup';
 import { ReactComponent as FilterIcon } from '../../assets/svg/tune_FILL0_wght400_GRAD0_opsz24.svg';
 import { ReactComponent as SearchIcon } from '../../assets/svg/search_FILL0_wght400_GRAD0_opsz24.svg';
 
 function SidebarFilter({
-  categories,
-  selectedCategories,
-  onSelectCategories,
-  customers,
-  selectedCustomers,
-  onSelectCustomers,
+  filterGroups,
   currentFilter,
   setCurrentFilter,
   onSearch
@@ -38,33 +34,6 @@ function SidebarFilter({
     onSearch(event.target.value);
   };
 
-  const toggleCategory = (categorySlug) => {
-    const updatedCategories = selectedCategories.includes(categorySlug)
-      ? selectedCategories.filter((category) => category !== categorySlug)
-      : [...selectedCategories, categorySlug];
-
-    onSelectCategories(updatedCategories);
-
-    // Update the currentFilter for categories
-    setCurrentFilter((prevFilter) => ({
-      ...prevFilter,
-      categories: updatedCategories,
-    }));
-  };
-
-  const toggleCustomer = (customerSlug) => {
-    const updatedCustomers = selectedCustomers.includes(customerSlug)
-      ? selectedCustomers.filter((customer) => customer !== customerSlug)
-      : [...selectedCustomers, customerSlug];
-
-    onSelectCustomers(updatedCustomers);
-
-    // Update the currentFilter for customers
-    setCurrentFilter((prevFilter) => ({
-      ...prevFilter,
-      customers: updatedCustomers,
-    }));
-  };
 
   useEffect(() => {
     const handleViewportChange = () => {
@@ -126,83 +95,42 @@ function SidebarFilter({
           <FilterIcon style={{ width: '32px', height: '32px' }} />
         </div>
       </div>
+
       <div className={`filter-more bg-white md:bg-transparent md:block p-4 md:p-0 mb-4 md:mb-0 rounded-b border-2 border-t-0 md:border-none ${!isMoreFilterActive ? 'hidden' : ''}`}>
+
         <div className='pb-1 mb-4 border-b border-black flex items-center justify-between'>
           <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Filter by</h2>
           <span
             className='text-sm text-gray-400 cursor-pointer hover:text-black'
             onClick={() => {
-              onSelectCategories([]);
-              onSelectCustomers([]);
-              setCurrentFilter({});
+              // Reset all filters
+              const resetFilters = {};
+              filterGroups.forEach(group => {
+                group.onSelect([]);
+                resetFilters[group.filterKey] = [];
+              });
+              setCurrentFilter(resetFilters);
             }}
             title="Clear all filters"
           >
             Clear All
           </span>
         </div>
-        <div className='flex items-center justify-between py-2'>
-          <h3 className='uppercase text-xs font-bold'>Categories</h3>
-          <span
-            className='text-xs text-gray-400 cursor-pointer hover:text-black'
-            onClick={() => {
-              onSelectCategories([]);
-              setCurrentFilter((prevFilter) => ({
-                ...prevFilter,
-                categories: [],
-              }));
-            }}
-            title="Clear all Product Category filters"
-          >
-            Clear
-          </span>
-        </div>
-        <ul className={`mb-4 border p-2 ${selectedCategories.length > 0 ? 'border-black' : 'border-gray-300'}`}>
-          {categories.map((category, index) => (
-            <li key={category.id} className={index !== categories.length - 1 ? "mb-2" : ""}>
-              <label className='cursor-pointer text-gray-800 flex items-center gap-2'>
-                <input
-                  type="checkbox"
-                  checked={selectedCategories.includes(category.slug)}
-                  onChange={() => toggleCategory(category.slug)}
-                  className='border-black focus:border-pink-600 outline-none focus:ring-1 focus:ring-pink-600'
-                />
-                <span className="font-normal">{category.name}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
-        <div className='flex items-center justify-between py-2'>
-          <h3 className='uppercase text-xs font-bold'>Customers</h3>
-          <span
-            className='text-xs text-gray-400 cursor-pointer hover:text-black'
-            onClick={() => {
-              onSelectCustomers([]);
-              setCurrentFilter((prevFilter) => ({
-                ...prevFilter,
-                customers: [],
-              }));
-            }}
-            title="Clear all Customer Type filters"
-          >
-            Clear
-          </span>
-        </div>
-        <ul className={`mb-4 border p-2 ${selectedCategories.length > 0 ? 'border-black' : 'border-gray-300'}`}>
-          {customers.map((customer, index) => (
-            <li key={customer.id} className={index !== customers.length - 1 ? "mb-2" : ""}>
-              <label className='cursor-pointer text-gray-800 flex items-center gap-2'>
-                <input
-                  type="checkbox"
-                  checked={selectedCustomers.includes(customer.slug)}
-                  onChange={() => toggleCustomer(customer.slug)}
-                  className='border-black focus:border-pink-600 outline-none focus:ring-1 focus:ring-pink-600'
-                />
-                <span>{customer.name}</span>
-              </label>
-            </li>
-          ))}
-        </ul>
+
+
+        {filterGroups.map((group, index) => (
+          <FilterGroup
+            key={index}
+            title={group.title}
+            items={group.items}
+            selectedItems={group.selectedItems}
+            onSelect={group.onSelect}
+            currentFilter={currentFilter}
+            setCurrentFilter={setCurrentFilter}
+            filterKey={group.filterKey}
+          />
+        ))}
+
       </div>
     </div>
   );

@@ -5,18 +5,79 @@ import './tailwind-output.css';
 import './App.css';
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedCustomers, setSelectedCustomers] = useState([]);
-  //const [loading, setLoading] = useState(false);
+  const [firms, setFirms] = useState([]);
+  const [filteredFirms, setFilteredFirms] = useState([]);
+  const [currentFilter, setCurrentFilter] = useState({});
+
+  const filterGroups = [
+    {
+      title: "Bonus Category",
+      note: "When the billable hours requirement is unknown or in excess of 2000 hours, bonuses are marked as Full Match.",
+      items: [
+        {
+          id: "bonus_category_8",
+          name: "Market +",
+          slug: "market-plus",
+          value: 8
+        },
+        {
+          id: "bonus_category_5",
+          name: "Full Match < 2000 Hours Billable Requirement",
+          slug: "full-match-less-than-2000-hours-billable-requirement",
+          value: 5
+        },
+        {
+          id: "bonus_category_4",
+          name: "Full Match",
+          slug: "full-match",
+          value: 4
+        },
+        {
+          id: "bonus_category_3",
+          name: "Less Than Market",
+          slug: "less-than-market",
+          value: 2
+        },
+        {
+          id: "bonus_category_1",
+          name: "Black Box",
+          slug: "black-box",
+          value: 1
+        }
+
+      ],
+      //selectedItems: selectedCategories,
+      //onSelect: onSelectCategories,
+      filterKey: "value",
+    },
+    {
+      title: "Salary Scale",
+      note: "Market salary is based on a $202,500-205,000 scale for first-year associates.",
+      items: [
+        {
+          id: "salary_scale_4",
+          name: "Market +",
+          slug: "market-plus",
+          value: 4
+        },
+        {
+          id: "salary_scale_3",
+          name: "Market",
+          slug: "market",
+          value: 3
+        },
+        {
+          id: "salary_scale_2",
+          name: "Below Market",
+          slug: "below-market",
+          value: 2
+        },
+      ],
+      filterKey: "value",
+    },
+    
+  ];
   
-  const [currentFilter, setCurrentFilter] = useState({
-    categories: [],
-    customers: [],
-  });
 
   const isDevelopment = window.location.hostname === "dev.abovethelaw.com" || window.location.hostname === "localhost";
 
@@ -24,39 +85,28 @@ function App() {
     ? 'http://dev.aldus.abovethelaw.com:3000/wp-api'
     : 'https://aldus.abovethelaw.com:3000/wp-api';
 
-  const fetchedProductsRef = useRef(false);
-
-  const fetchTopLevelTaxonomyTerms = useCallback(async (taxonomyType, stateSetter) => {
-    try {
-      const url = `${apiBasePoint}/wp-json/custom/v1/taxonomy/?taxonomy=${taxonomyType}&post_type=legal_provider`;
-      const response = await fetch(url);
-      const data = await response.json();
-      stateSetter(data);
-    } catch (error) {
-      console.error(`Error fetching ${taxonomyType}: `, error);
-    }
-  }, [apiBasePoint]);
+  const fetchedFirmsRef = useRef(false);
 
   const handleSearch = (searchTerm) => {
-    // Update the filteredProducts based on the search term
+    // Update the filteredFirms based on the search term
 
-    const filtered = products.filter((product) => {
-      // Check if the product title, excerpt, content, or categories/customers match the search term
+    const filtered = firms.filter((firm) => {
+      // Check if the firm title, excerpt, content, or categories/customers match the search term
       return (
-        product.post.post_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.post.post_excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.post.post_content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.categories.some((category) =>
-          category.name.toLowerCase().includes(searchTerm.toLowerCase())
+        firm.post.post_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        firm.post.post_excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+
+        firm.bonus_category.some((category) =>
+          category.display.toLowerCase().includes(searchTerm.toLowerCase())
         ) ||
-        product.customers.some((customer) =>
-          customer.name.toLowerCase().includes(searchTerm.toLowerCase())
+        firm.salary_scale.some((salary) =>
+          salary.display.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     });
 
-    // Set the filtered products in the state
-    setFilteredProducts(filtered);
+    // Set the filtered firms in the state
+    setFilteredFirms(filtered);
   };
 
   useEffect(() => {
@@ -67,8 +117,8 @@ function App() {
         const apiUrl = `${apiBasePoint}/wp-json/custom/v1/transparency_firms_data`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        setProducts(data);
-        setFilteredProducts(data);
+        setFirms(data);
+        setFilteredFirms(data);
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
@@ -76,17 +126,14 @@ function App() {
       }
     };
 
-    if ( ! fetchedProductsRef.current) {
+    if ( ! fetchedFirmsRef.current) {
       fetchFirms();
-      fetchedProductsRef.current = true;
+      fetchedFirmsRef.current = true;
     }
     
-  }, [products, apiBasePoint]);
+  }, [firms, apiBasePoint]);
 
-  useEffect(() => {
-    fetchTopLevelTaxonomyTerms('product_category', setCategories);
-    fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
-  }, [fetchTopLevelTaxonomyTerms]);
+  
 
   return (
     <div className="app bg-gray-100" id="legal-provider-directory">
@@ -95,19 +142,14 @@ function App() {
       </h1>
       <div className="md:flex mx-auto">
         <SidebarFilter
-          categories={categories}
-          selectedCategories={selectedCategories}
-          onSelectCategories={setSelectedCategories}
-          customers={customers}
-          selectedCustomers={selectedCustomers}
-          onSelectCustomers={setSelectedCustomers}
+          filterGroups={filterGroups}
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter} 
           onSearch={handleSearch}
         />
         <LayoutListGrid 
-          products={filteredProducts} 
-          currentFilter={currentFilter} 
+          firms={filteredFirms} 
+          currentFilter={currentFilter} e
         />
       </div>
     </div>
