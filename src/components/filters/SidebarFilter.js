@@ -62,7 +62,7 @@ function SidebarFilter({
         <div className='filter-search-icon md:hidden flex-none p-2 opacity-40'>
           <SearchIcon style={{ width: '32px', height: '32px' }} />
         </div>
-        <h2 className='block uppercase text-sm uppercase text-gray tracking-wider pb-1 mb-4 border-b border-black hidden md:block'>
+        <h2 className='block text-sm uppercase text-gray tracking-wider pb-1 mb-4 border-b border-black hidden md:block'>
           Search by keyword
         </h2>
         <div className="items-center justify-between md:mb-4 relative flex-1">
@@ -77,15 +77,16 @@ function SidebarFilter({
           />
 
           {searchTerm && ( // Show the "X" icon only if searchTerm has a value
-            <span
+            <button
               className="absolute top-50 transform -translate-y-50 right-2 cursor-pointer text-3xl text-gray-400 hover:text-black p-1"
               onClick={() => {
                 setSearchTerm(''); // Clear the search term
                 onSearch(''); // Update filtered results
-              }}
+              }} 
+              aria-label="Clear search"
             >
               &times;
-            </span>
+            </button>
           )}
         </div>
         <div
@@ -99,8 +100,8 @@ function SidebarFilter({
       <div className={`filter-more bg-white md:bg-transparent md:block p-4 md:p-0 mb-4 md:mb-0 rounded-b border-2 border-t-0 md:border-none ${!isMoreFilterActive ? 'hidden' : ''}`}>
 
         <div className='pb-1 mb-4 border-b border-black flex items-center justify-between'>
-          <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Filter by</h2>
-          <span
+          <h2 className='uppercase text-sm text-gray tracking-wider'>Filter by</h2>
+          <button
             className='text-sm text-gray-400 cursor-pointer hover:text-black'
             onClick={() => {
               // Reset all filters
@@ -111,16 +112,17 @@ function SidebarFilter({
               });
               setCurrentFilter(resetFilters);
             }}
-            title="Clear all filters"
+            
+            aria-label="Clear all filters"
           >
             Clear All
-          </span>
+          </button>
         </div>
 
 
         {filterGroups.map((group, index) => (
           <FilterGroup
-            key={index}
+            key={`filter-group-${index}`}
             title={group.title}
             items={group.items}
             selectedItems={group.selectedItems}

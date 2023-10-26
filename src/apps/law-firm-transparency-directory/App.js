@@ -8,11 +8,17 @@ function App() {
   const [firms, setFirms] = useState([]);
   const [filteredFirms, setFilteredFirms] = useState([]);
   const [currentFilter, setCurrentFilter] = useState({});
+  const [selectedBonusCategories, setSelectedBonusCategories] = useState([]);
+  const [selectedSalaryScales, setSelectedSalaryScales] = useState([]);
+
 
   const filterGroups = [
     {
       title: "Bonus Category",
       note: "When the billable hours requirement is unknown or in excess of 2000 hours, bonuses are marked as Full Match.",
+      selectedItems: selectedBonusCategories,
+      onSelect: setSelectedBonusCategories,
+      filterKey: "value",
       items: [
         {
           id: "bonus_category_8",
@@ -45,14 +51,14 @@ function App() {
           value: 1
         }
 
-      ],
-      //selectedItems: selectedCategories,
-      //onSelect: onSelectCategories,
-      filterKey: "value",
+      ]
     },
     {
       title: "Salary Scale",
       note: "Market salary is based on a $202,500-205,000 scale for first-year associates.",
+      selectedItems: selectedSalaryScales,
+      onSelect: setSelectedSalaryScales,
+      filterKey: "value",
       items: [
         {
           id: "salary_scale_4",
@@ -72,8 +78,7 @@ function App() {
           slug: "below-market",
           value: 2
         },
-      ],
-      filterKey: "value",
+      ]
     },
     
   ];
@@ -148,7 +153,7 @@ function App() {
           onSearch={handleSearch}
         />
         <LayoutListGrid 
-          firms={filteredFirms} 
+          items={filteredFirms} 
           currentFilter={currentFilter} e
         />
       </div>

@@ -9,6 +9,7 @@ function FilterGroup({
   setCurrentFilter,
   filterKey
 }) {
+	
   const toggleItem = (itemSlug) => {
     const updatedItems = selectedItems.includes(itemSlug)
       ? selectedItems.filter((item) => item !== itemSlug)
@@ -26,7 +27,7 @@ function FilterGroup({
     <div id={`filter-${title}`}>
       <div className='flex items-center justify-between py-2'>
         <h3 className='uppercase text-xs font-bold'>{title}</h3>
-        <span
+        <button
           className='text-xs text-gray-400 cursor-pointer hover:text-black'
           onClick={() => {
             onSelect([]);
@@ -35,10 +36,11 @@ function FilterGroup({
               [filterKey]: [],
             }));
           }}
-          title={`Clear all ${title} filters`}
+           
+					aria-label={`Clear all ${title} filters`}
         >
           Clear
-        </span>
+        </button>
       </div>
       <ul className={`mb-4 border p-2 ${selectedItems.length > 0 ? 'border-black' : 'border-gray-300'}`}>
         {items.map((item, index) => (
