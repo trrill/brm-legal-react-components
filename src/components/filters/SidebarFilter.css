@@ -1,3 +1,18 @@
+.filter-sidebar input[type="checkbox"] {
+	appearance: none;
+	border-width: 1px;
+	border-style: solid;
+	width: 15px;
+	height: 15px;
+	transition: all 0.3s ease-in-out;
+}
+	.filter-sidebar input[type="checkbox"]:checked {
+		background-color: #ff1b6b;
+		width: 15px;
+		height: 15px;
+	}
+
+
 .filter-base,
 .filter-more-icon {
 	transition: all 0.2s ease-in-out;

@@ -34,7 +34,6 @@ function SidebarFilter({
     onSearch(event.target.value);
   };
 
-
   useEffect(() => {
     const handleViewportChange = () => {
       if (window.innerWidth < 768) {
@@ -54,7 +53,6 @@ function SidebarFilter({
       window.removeEventListener('resize', handleViewportChange);
     };
   }, []); // Runs once on mount
-
 
   return (
     <div className={`filter-sidebar md:w-1/4 px-2 md:pr-4 ${isMoreFilterActive ? 'filter-more-active' : ''}`}>
@@ -118,14 +116,14 @@ function SidebarFilter({
             Clear All
           </button>
         </div>
-
+          
 
         {filterGroups.map((group, index) => (
           <FilterGroup
             key={`filter-group-${index}`}
             title={group.title}
-            items={group.items}
-            selectedItems={group.selectedItems}
+            filterItems={group.filterItems}
+            selectedFilterItems={group.selectedFilterItems}
             onSelect={group.onSelect}
             currentFilter={currentFilter}
             setCurrentFilter={setCurrentFilter}

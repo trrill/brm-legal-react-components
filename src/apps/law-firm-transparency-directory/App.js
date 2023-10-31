@@ -11,7 +11,6 @@ function App() {
   const [selectedBonusCategories, setSelectedBonusCategories] = useState([]);
   const [selectedSalaryScales, setSelectedSalaryScales] = useState([]);
 
-
   const filterGroups = [
     {
       title: "Bonus Category",
@@ -83,7 +82,6 @@ function App() {
     
   ];
   
-
   const isDevelopment = window.location.hostname === "dev.abovethelaw.com" || window.location.hostname === "localhost";
 
   const apiBasePoint = isDevelopment 
@@ -122,12 +120,19 @@ function App() {
         const apiUrl = `${apiBasePoint}/wp-json/custom/v1/transparency_firms_data`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        setFirms(data);
-        setFilteredFirms(data);
+        let dataArray = data;
+
+        if ( ! Array.isArray(data) ) {
+          dataArray = Object.values(data);
+        }
+        
+        setFirms(dataArray);
+        setFilteredFirms(dataArray);
+
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
-        //setLoading(false);
+        //
       }
     };
 

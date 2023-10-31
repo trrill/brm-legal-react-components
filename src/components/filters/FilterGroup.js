@@ -2,8 +2,8 @@ import React from 'react';
 
 function FilterGroup({
   title,
-  items,
-  selectedItems,
+  filterItems,
+  selectedFilterItems,
   onSelect,
   currentFilter,
   setCurrentFilter,
@@ -11,9 +11,9 @@ function FilterGroup({
 }) {
 	
   const toggleItem = (itemSlug) => {
-    const updatedItems = selectedItems.includes(itemSlug)
-      ? selectedItems.filter((item) => item !== itemSlug)
-      : [...selectedItems, itemSlug];
+    const updatedItems = selectedFilterItems.includes(itemSlug)
+      ? selectedFilterItems.filter((item) => item !== itemSlug)
+      : [...selectedFilterItems, itemSlug];
 
     onSelect(updatedItems);
 
@@ -35,22 +35,21 @@ function FilterGroup({
               ...prevFilter,
               [filterKey]: [],
             }));
-          }}
-           
+          }} 
 					aria-label={`Clear all ${title} filters`}
         >
           Clear
         </button>
       </div>
-      <ul className={`mb-4 border p-2 ${selectedItems.length > 0 ? 'border-black' : 'border-gray-300'}`}>
-        {items.map((item, index) => (
-          <li key={item.id} className={index !== items.length - 1 ? "mb-2" : ""}>
+      <ul className={`mb-4 border p-2 ${selectedFilterItems && selectedFilterItems.length > 0 ? 'border-black' : 'border-gray-300'}`}>
+        {filterItems && filterItems.map((item, index) => (
+          <li key={`filter-item-${item.ID}`} className={index !== filterItems.length - 1 ? "mb-2" : ""}>
             <label className='cursor-pointer text-gray-800 flex items-center gap-2'>
               <input
                 type="checkbox"
-                checked={selectedItems.includes(item.slug)}
+                checked={selectedFilterItems && selectedFilterItems.includes(item.slug)}
                 onChange={() => toggleItem(item.slug)}
-                className='border-black focus:border-pink-600 outline-none focus:ring-1 focus:ring-pink-600'
+                className='border-black focus:border-pink-600 outline-none focus:ring-1 focus:ring-pink-600 flex-none'
               />
               <span className="font-normal">{item.name}</span>
             </label>

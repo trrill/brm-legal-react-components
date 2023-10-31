@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import LayoutListItem from '../items/LayoutListItem';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ReactComponent as GridIcon } from '../../assets/svg/view_module_black_24dp.svg';
@@ -6,44 +6,49 @@ import { ReactComponent as ListIcon } from '../../assets/svg/view_list_black_24d
 
 import './LayoutListGrid.css';
 
-function LayoutListGrid({ items, currentFilter }) {
-  const [layout, setLayout] = useState('grid');
-  const [searchTerm] = useState('');
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
 
+function LayoutListGrid({ items, currentFilter }) {
+  const [layout, setLayout] = useState(window.innerWidth < 768 ? 'list' : 'grid');
+  const [searchTerm] = useState('');
   const itemRefs = React.useRef({});
 
-  console.log('items', items);
+  const filteredItems = useMemo(() => {
+    return items.filter((item) => {
+        const itemCategories = item.categories || {};
+        const itemCustomers = item.customers || {};
 
-  const filteredItems = items.filter((item) => {
-    const itemCategories = item.categories || {};
-    const itemCustomers = item.customers || {};
+        const categorySlugs = (itemCategories) ? Object.values(itemCategories).map((category) => category.slug) : [];
+        const customerSlugs = (itemCustomers) ? Object.values(itemCustomers).map((customer) => customer.slug) : [];
 
-    const categorySlugs = (itemCategories) ? Object.values(itemCategories).map((category) => category.slug): [];
-    const customerSlugs = (itemCustomers) ? Object.values(itemCustomers).map((customer) => customer.slug): [];
+        const selectedCategories = Object.values(currentFilter.categories || {});
+        const selectedCustomers = Object.values(currentFilter.customers || {});
 
-    const selectedCategories = Object.values(currentFilter.categories || {});
-    const selectedCustomers = Object.values(currentFilter.customers || {});
+        const matchesCategories =
+            selectedCategories.length === 0 ||
+            categorySlugs.some((slug) => selectedCategories.includes(slug));
 
-    const matchesCategories =
-      selectedCategories.length === 0 ||
-      categorySlugs.some((slug) => selectedCategories.includes(slug));
+        const matchesCustomers =
+            selectedCustomers.length === 0 ||
+            customerSlugs.some((slug) => selectedCustomers.includes(slug));
 
-    const matchesCustomers =
-      selectedCustomers.length === 0 ||
-      customerSlugs.some((slug) => selectedCustomers.includes(slug));
+        const matchesSearch =
+            searchTerm === '' ||
+            item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            categorySlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            customerSlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesSearch =
-      searchTerm === '' ||
-      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      categorySlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      customerSlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase()));
-
-
-    return matchesCategories && matchesCustomers && matchesSearch;
-  });
-
+        return matchesCategories && matchesCustomers && matchesSearch;
+    });
+  }, [items, currentFilter, searchTerm]); // Memoized based on dependencies
 
   // Directly initialize the refs for the current set of filtered items, i.e. all of em
   filteredItems.forEach(item => {
@@ -52,24 +57,20 @@ function LayoutListGrid({ items, currentFilter }) {
     }
   });
 
-
   useEffect(() => {
-    const handleViewportChange = () => {
+    const handleViewportChange = debounce(() => {
       if (window.innerWidth < 768) {
-        setLayout('list');
+          setLayout('list');
       } else {
-        setLayout('grid');
+          setLayout('grid');
       }
-    };
-
-    // Set initial layout based on viewport width
-    handleViewportChange();
+    }, 250); // Debounce time in milliseconds
 
     window.addEventListener('resize', handleViewportChange);
 
     // Clean up the event listener when the component unmounts
     return () => {
-      window.removeEventListener('resize', handleViewportChange);
+        window.removeEventListener('resize', handleViewportChange);
     };
   }, []); // Run once on mount
 
