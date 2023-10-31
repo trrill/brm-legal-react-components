@@ -1,5 +1,5 @@
-import React from 'react';
-
+import React, {useEffect} from 'react';
+import { stringToReactKey } from '../../utils/utils';
 
 function FilterGroup({
   title,
@@ -12,22 +12,27 @@ function FilterGroup({
   itemKey
 }) {
 	
-  const toggleItem = (itemValue) => {
+  const toggleItem = (item) => {
+    const itemValue = item[itemKey];
+    
     const updatedItems = selectedFilterItems.includes(itemValue)
-      ? selectedFilterItems.filter((item) => item !== itemValue)
+      ? selectedFilterItems.filter((selectedItem) => selectedItem !== itemValue)
       : [...selectedFilterItems, itemValue];
-
+  
     onSelect(updatedItems);
-
+  
     setCurrentFilter((prevFilter) => ({
       ...prevFilter,
-      [filterKey]: updatedItems,
+      [filterKey]: {
+        values: updatedItems,
+        attribute: itemKey
+      }
     }));
-  }
+  }  
 
   /* useEffect(() => {
     console.log('currentFilter (updated): ', currentFilter);
-  }, [currentFilter]); */
+  }, [currentFilter]);  */
 
   return (
     <div id={`filter-${title}`}>
@@ -49,12 +54,13 @@ function FilterGroup({
       </div>
       <ul className={`mb-4 border p-2 ${selectedFilterItems && selectedFilterItems.length > 0 ? 'border-black' : 'border-gray-300'}`}>
         {filterItems && filterItems.map((item, index) => (
-          <li key={`filter-item-${item.ID}`} className={index !== filterItems.length - 1 ? "mb-2" : ""}>
+          <li key={ `filter-${stringToReactKey(item.name)}-${index}` } className={index !== filterItems.length - 1 ? "mb-2" : ""}>
+            
             <label className='cursor-pointer text-gray-800 flex items-center gap-2'>
               <input
                 type="checkbox"
                 checked={selectedFilterItems && selectedFilterItems.includes(item[itemKey])}
-                onChange={() => toggleItem(item[itemKey])}
+                onChange={() => toggleItem(item)}
                 className='border-black focus:border-pink-600 outline-none focus:ring-1 focus:ring-pink-600 flex-none'
               />
               <span className="font-normal">{item.name}</span>

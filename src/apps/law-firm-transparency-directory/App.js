@@ -15,10 +15,11 @@ function App() {
     {
       title: "Bonus Category",
       note: "When the billable hours requirement is unknown or in excess of 2000 hours, bonuses are marked as Full Match.",
-      selectedItems: selectedBonusCategories,
+      selectedFilterItems: selectedBonusCategories,
       onSelect: setSelectedBonusCategories,
+      filterKey: "bonus_category",
       itemKey: "value",
-      items: [
+      filterItems: [
         {
           id: "bonus_category_8",
           name: "Market +",
@@ -55,10 +56,11 @@ function App() {
     {
       title: "Salary Scale",
       note: "Market salary is based on a $202,500-205,000 scale for first-year associates.",
-      selectedItems: selectedSalaryScales,
+      selectedFilterItems: selectedSalaryScales,
       onSelect: setSelectedSalaryScales,
+      filterKey: "salary_scale",
       itemKey: "value",
-      items: [
+      filterItems: [
         {
           id: "salary_scale_4",
           name: "Market +",
@@ -78,8 +80,7 @@ function App() {
           value: 2
         },
       ]
-    },
-    
+    }
   ];
   
   const isDevelopment = window.location.hostname === "dev.abovethelaw.com" || window.location.hostname === "localhost";
@@ -91,24 +92,32 @@ function App() {
   const fetchedFirmsRef = useRef(false);
 
   const handleSearch = (searchTerm) => {
-    // Update the filteredFirms based on the search term
-
-    const filtered = firms.filter((firm) => {
-      // Check if the firm title, excerpt, content, or categories/customers match the search term
-      return (
-        firm.post.post_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        firm.post.post_excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-
-        firm.bonus_category.some((category) =>
-          category.display.toLowerCase().includes(searchTerm.toLowerCase())
-        ) ||
-        firm.salary_scale.some((salary) =>
-          salary.display.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    });
-
-    // Set the filtered firms in the state
+    //console.log('searchTerm: ', searchTerm);
+    const regex = new RegExp(searchTerm.toLowerCase());
+  
+    const matchesSearchTerm = (str) => regex.test(str.toLowerCase());
+  
+    const firmMatchesSearch = (firm) => {
+      // Check if the provider title, excerpt, or content matches the search term
+      if (
+        matchesSearchTerm(firm.post.post_title) ||
+        matchesSearchTerm(firm.post.post_excerpt) ||
+        matchesSearchTerm(firm.post.post_content)
+      ) {
+        return true;
+      }
+  
+      // Check if any of the firm's categories/customers match the search term
+      const bonusCategoryMatches = firm.bonus_category.some((category) => matchesSearchTerm(category.display));
+      const salaryScaleMatches = firm.salary_scale.some((customer) => matchesSearchTerm(customer.display));
+  
+      return bonusCategoryMatches || salaryScaleMatches;
+    };
+  
+    // Filter providers based on the search criteria
+    const filtered = firms.filter(firmMatchesSearch);
+  
+    // Update the state
     setFilteredFirms(filtered);
   };
 
@@ -116,7 +125,7 @@ function App() {
     const fetchFirms = async () => {
       //setLoading(true);
       try {
-        console.log('Fetching firms...');
+        //console.log('Fetching firms...');
         const apiUrl = `${apiBasePoint}/wp-json/custom/v1/transparency_firms_data`;
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -143,12 +152,10 @@ function App() {
     
   }, [firms, apiBasePoint]);
 
-  
-
   return (
     <div className="app bg-gray-100" id="legal-provider-directory">
-      <h1 className="uppercase text-white text-mono text-5xl text-center p-4 pt-5 m-0 mb-4 gradient-title">
-        Legal Tech Directory
+      <h1 className="uppercase text-5xl text-center p-4 pt-5 m-0 mb-4 border-b-2 border-pear">
+        Law Firm Transparency
       </h1>
       <div className="md:flex mx-auto">
         <SidebarFilter
@@ -158,8 +165,10 @@ function App() {
           onSearch={handleSearch}
         />
         <LayoutListGrid 
+          itemsName="Firms"
           items={filteredFirms} 
-          currentFilter={currentFilter} e
+          filterGroups={filterGroups} 
+          currentFilter={currentFilter} 
         />
       </div>
     </div>

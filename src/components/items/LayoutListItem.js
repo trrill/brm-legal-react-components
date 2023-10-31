@@ -1,6 +1,6 @@
 import React, {  useState, useEffect, useCallback } from 'react';
 import DOMPurify from 'dompurify';
-import { debounce } from '../utils/utils';
+import { debounce } from '../../utils/utils';
 import './LayoutListItem.css';
 
 const LayoutListItem = React.forwardRef(({ item, layout }, ref) => {

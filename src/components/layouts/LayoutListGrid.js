@@ -3,41 +3,83 @@ import LayoutListItem from '../items/LayoutListItem';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ReactComponent as GridIcon } from '../../assets/svg/view_module_black_24dp.svg';
 import { ReactComponent as ListIcon } from '../../assets/svg/view_list_black_24dp.svg';
-import { debounce } from '../utils/utils';
+import { debounce } from '../../utils/utils';
 import './LayoutListGrid.css';
 
-function LayoutListGrid({ items, currentFilter }) {
+function LayoutListGrid({ itemsName, items, filterGroups, currentFilter }) {
   const [layout, setLayout] = useState(window.innerWidth < 768 ? 'list' : 'grid');
   const [searchTerm] = useState('');
   const itemRefs = React.useRef({});
 
   const filteredItems = useMemo(() => {
+    console.log("Current Filter:", currentFilter);
+
+    /* Don't just check for empty currentFilter;
+    check whether filter actually has items with values. */
+    if (Object.keys(currentFilter).length === 0 || 
+    Object.values(currentFilter).every(filter => filter.values && filter.values.length === 0)) {
+    
+      return items;
+    }
+
     return items.filter((item) => {
-      // Iterate over each key in currentFilter and check if item matches the filters
-      return Object.keys(currentFilter).every(filterKey => {
-          // Get the current item's attributes (categories, customers, etc.)
-          const itemAttributes = item[filterKey] || {};
+      console.log("Inspecting Item:", item);
 
-          const attributeSlugs = (itemAttributes) 
-              ? Object.values(itemAttributes).map(attribute => attribute.slug) 
-              : [];
+      let isItemMatched = false; // flag to determine if item matches any filter
+  
+      for (let [key, filterCriteria] of Object.entries(currentFilter)) {
+        const filterKey = key;
+        const itemKey = filterCriteria.attribute || "value"; // default to "value" if not provided
+        const selectedFilterItems = filterCriteria.values;
+  
+        if (!item[filterKey]) continue;
+  
+        // For array attributes, loop through each element
+        if (Array.isArray(item[filterKey])) {
+          console.log("Item attribute is array:", item[filterKey]);
 
-          const selectedAttributes = Object.values(currentFilter[filterKey] || {});
+          const matchesAnyInArray = item[filterKey].some(element => {
+            console.log("Matched in array:", element);
 
-          const matchesAttributes =
-              selectedAttributes.length === 0 ||
-              attributeSlugs.some(slug => selectedAttributes.includes(slug));
+            return selectedFilterItems.includes(element[itemKey]);
+          });
+          if (matchesAnyInArray) {
+            isItemMatched = true;
+            break; // Break out of the loop as soon as a match is found
+          }
+        } else {
+          
+          // For non-array attributes
+          let itemValue = item[filterKey][itemKey];
+          itemValue = itemValue.replace(/^"|"$/g, '');
 
-          return matchesAttributes;
-      }) && (
-          searchTerm === '' ||
-          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.content.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+          console.log("Original Item Value:", itemValue);
+
+          if (!isNaN(itemValue) && typeof selectedFilterItems[0] === 'number') {
+              itemValue = parseFloat(itemValue);
+          }
+
+          console.log("Parsed Item Value:", itemValue);
+
+          if (selectedFilterItems.includes(itemValue)) {
+              console.log("Item matched:", item);
+
+              isItemMatched = true;
+              break; // Break out of the loop as soon as a match is found
+          }
+
+        }
+      }
+  
+      
+
+
+      return isItemMatched;  // Return true if item matches any filter criteria, false otherwise
     });
-}, [items, currentFilter, searchTerm]);
+  }, [items, currentFilter]);
 
+  console.log("Filtered Items Count:", filteredItems.length);
+  
   // Directly initialize the refs for the current set of filtered items, i.e. all of em
   filteredItems.forEach(item => {
     if (!itemRefs.current[item.post.ID]) {
@@ -66,7 +108,9 @@ function LayoutListGrid({ items, currentFilter }) {
     <div className='md:w-3/4 px-2 md:pl-4 mt-6 md:mt-0'>
       <div className='flex items-center mb-4'>
         <div>
-          <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>Providers</h2>
+          <h2 className='uppercase text-sm uppercase text-gray tracking-wider'>
+            {itemsName}
+          </h2>
           <p className='text-sm text-gray-400'>{filteredItems.length} results</p>
         </div>
         <div id="listing-layout-toggle" className='hidden md:flex ml-auto items-center'>

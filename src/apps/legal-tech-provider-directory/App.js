@@ -81,7 +81,6 @@ function App() {
     setFilteredProviders(filtered);
   };
   
-
   useEffect(() => {
     const fetchData = async () => {
         try {
@@ -127,6 +126,7 @@ function App() {
           onSearch={handleSearch}
         />
         <LayoutListGrid 
+          itemsName="Providers"
           items={filteredProviders} 
           currentFilter={currentFilter} 
         />
