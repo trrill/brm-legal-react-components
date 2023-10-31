@@ -3,16 +3,8 @@ import LayoutListItem from '../items/LayoutListItem';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 import { ReactComponent as GridIcon } from '../../assets/svg/view_module_black_24dp.svg';
 import { ReactComponent as ListIcon } from '../../assets/svg/view_list_black_24dp.svg';
-
+import { debounce } from '../utils/utils';
 import './LayoutListGrid.css';
-
-function debounce(func, wait) {
-  let timeout;
-  return function (...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
 
 function LayoutListGrid({ items, currentFilter }) {
   const [layout, setLayout] = useState(window.innerWidth < 768 ? 'list' : 'grid');
@@ -21,34 +13,30 @@ function LayoutListGrid({ items, currentFilter }) {
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-        const itemCategories = item.categories || {};
-        const itemCustomers = item.customers || {};
+      // Iterate over each key in currentFilter and check if item matches the filters
+      return Object.keys(currentFilter).every(filterKey => {
+          // Get the current item's attributes (categories, customers, etc.)
+          const itemAttributes = item[filterKey] || {};
 
-        const categorySlugs = (itemCategories) ? Object.values(itemCategories).map((category) => category.slug) : [];
-        const customerSlugs = (itemCustomers) ? Object.values(itemCustomers).map((customer) => customer.slug) : [];
+          const attributeSlugs = (itemAttributes) 
+              ? Object.values(itemAttributes).map(attribute => attribute.slug) 
+              : [];
 
-        const selectedCategories = Object.values(currentFilter.categories || {});
-        const selectedCustomers = Object.values(currentFilter.customers || {});
+          const selectedAttributes = Object.values(currentFilter[filterKey] || {});
 
-        const matchesCategories =
-            selectedCategories.length === 0 ||
-            categorySlugs.some((slug) => selectedCategories.includes(slug));
+          const matchesAttributes =
+              selectedAttributes.length === 0 ||
+              attributeSlugs.some(slug => selectedAttributes.includes(slug));
 
-        const matchesCustomers =
-            selectedCustomers.length === 0 ||
-            customerSlugs.some((slug) => selectedCustomers.includes(slug));
-
-        const matchesSearch =
-            searchTerm === '' ||
-            item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            categorySlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            customerSlugs.some((slug) => slug.toLowerCase().includes(searchTerm.toLowerCase()));
-
-        return matchesCategories && matchesCustomers && matchesSearch;
+          return matchesAttributes;
+      }) && (
+          searchTerm === '' ||
+          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.content.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     });
-  }, [items, currentFilter, searchTerm]); // Memoized based on dependencies
+}, [items, currentFilter, searchTerm]);
 
   // Directly initialize the refs for the current set of filtered items, i.e. all of em
   filteredItems.forEach(item => {
@@ -73,7 +61,6 @@ function LayoutListGrid({ items, currentFilter }) {
         window.removeEventListener('resize', handleViewportChange);
     };
   }, []); // Run once on mount
-
 
   return (
     <div className='md:w-3/4 px-2 md:pl-4 mt-6 md:mt-0'>

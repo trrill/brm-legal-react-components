@@ -66,7 +66,7 @@ function SidebarFilter({
         <div className="items-center justify-between md:mb-4 relative flex-1">
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search by keyword..."
             value={searchTerm}
             onChange={handleSearchChange}
             className="w-full md:border border-gray-300 p-2 px-4 md:mb-4 outline-none text-2xl md:text-base"
@@ -106,7 +106,7 @@ function SidebarFilter({
               const resetFilters = {};
               filterGroups.forEach(group => {
                 group.onSelect([]);
-                resetFilters[group.filterKey] = [];
+                resetFilters[group.itemKey] = [];
               });
               setCurrentFilter(resetFilters);
             }}
@@ -126,8 +126,9 @@ function SidebarFilter({
             selectedFilterItems={group.selectedFilterItems}
             onSelect={group.onSelect}
             currentFilter={currentFilter}
-            setCurrentFilter={setCurrentFilter}
+            setCurrentFilter={setCurrentFilter} 
             filterKey={group.filterKey}
+            itemKey={group.itemKey}
           />
         ))}
 

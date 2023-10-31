@@ -1,35 +1,45 @@
-import React, { useCallback } from 'react';
+import React, {  useState, useEffect, useCallback } from 'react';
 import DOMPurify from 'dompurify';
+import { debounce } from '../utils/utils';
 import './LayoutListItem.css';
 
 const LayoutListItem = React.forwardRef(({ item, layout }, ref) => {
     const title = typeof item.post.post_title === 'string' ? item.post.post_title : '';
-    //const categoriesReadable = (item.categories) ? item.categories.map(category => category.slug).join(', ') : '';
-
-    
+    const description = item.post.post_excerpt !== '' ? item.post.post_excerpt : item.post.post_content;
+    const link = item.post.guid ? item.post.guid : item.post.permalink;
 
     function ItemDescription({ content }) {
         const cleanHTML = DOMPurify.sanitize(content);
         return <p className='text-sm text-gray-600' dangerouslySetInnerHTML={{ __html: cleanHTML }} />;
     }
 
-    const description = item.post.post_excerpt !== '' ? item.post.post_excerpt : item.post.post_content;
+    const [viewportWidth, setViewportWidth] = useState(window.innerWidth);
 
-    const link = item.post.guid ? item.post.guid : item.post.permalink;
-    console.log('link', link);
+    useEffect(() => {
+        const handleResize = debounce(() => {
+            setViewportWidth(window.innerWidth);
+        }, 250); // Debounce time in milliseconds
+
+        window.addEventListener('resize', handleResize);
+
+        // Clean up the event listener when the component unmounts
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
 
     const handleItemClick = useCallback(() => {
-        if (layout === 'list' && window.innerWidth < 768) {
-            window.location = link;
+        if (layout === 'list' && viewportWidth < 768) {
+            window.location = (item.post.guid) ? item.post.guid : item.post.permalink;
         }
-    }, [layout, link]); 
+    }, [layout, item.post.guid, item.post.permalink, viewportWidth]);
+
+    const classNameLogic = `item-item bg-white md:text-center p-2 mb-2 hover:grayscale-0 rounded md:rounded-lg shadow-lg flex ${layout === 'list' ? 'justify-between': ''} ${layout === 'list' && viewportWidth < 768 ? 'cursor-pointer':''}`;
+
 
     return (
         <div ref={ref} 
-            className={`item-item bg-white md:text-center p-2 mb-2 hover:grayscale-0 rounded md:rounded-lg shadow-lg flex 
-                ${layout === 'list' ? 'justify-between': ''} 
-                ${layout === 'list' && window.innerWidth < 768 ? 'cursor-pointer':''}
-                `} 
+            className={classNameLogic} 
                 key={item.ID} 
                 onClick={handleItemClick}
         >

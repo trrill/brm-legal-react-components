@@ -17,7 +17,7 @@ function App() {
       note: "When the billable hours requirement is unknown or in excess of 2000 hours, bonuses are marked as Full Match.",
       selectedItems: selectedBonusCategories,
       onSelect: setSelectedBonusCategories,
-      filterKey: "value",
+      itemKey: "value",
       items: [
         {
           id: "bonus_category_8",
@@ -57,7 +57,7 @@ function App() {
       note: "Market salary is based on a $202,500-205,000 scale for first-year associates.",
       selectedItems: selectedSalaryScales,
       onSelect: setSelectedSalaryScales,
-      filterKey: "value",
+      itemKey: "value",
       items: [
         {
           id: "salary_scale_4",

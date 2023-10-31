@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 function FilterGroup({
   title,
   filterItems,
@@ -7,13 +8,14 @@ function FilterGroup({
   onSelect,
   currentFilter,
   setCurrentFilter,
-  filterKey
+  filterKey,
+  itemKey
 }) {
 	
-  const toggleItem = (itemSlug) => {
-    const updatedItems = selectedFilterItems.includes(itemSlug)
-      ? selectedFilterItems.filter((item) => item !== itemSlug)
-      : [...selectedFilterItems, itemSlug];
+  const toggleItem = (itemValue) => {
+    const updatedItems = selectedFilterItems.includes(itemValue)
+      ? selectedFilterItems.filter((item) => item !== itemValue)
+      : [...selectedFilterItems, itemValue];
 
     onSelect(updatedItems);
 
@@ -21,7 +23,11 @@ function FilterGroup({
       ...prevFilter,
       [filterKey]: updatedItems,
     }));
-  };
+  }
+
+  /* useEffect(() => {
+    console.log('currentFilter (updated): ', currentFilter);
+  }, [currentFilter]); */
 
   return (
     <div id={`filter-${title}`}>
@@ -33,7 +39,7 @@ function FilterGroup({
             onSelect([]);
             setCurrentFilter((prevFilter) => ({
               ...prevFilter,
-              [filterKey]: [],
+              [itemKey]: [],
             }));
           }} 
 					aria-label={`Clear all ${title} filters`}
@@ -47,8 +53,8 @@ function FilterGroup({
             <label className='cursor-pointer text-gray-800 flex items-center gap-2'>
               <input
                 type="checkbox"
-                checked={selectedFilterItems && selectedFilterItems.includes(item.slug)}
-                onChange={() => toggleItem(item.slug)}
+                checked={selectedFilterItems && selectedFilterItems.includes(item[itemKey])}
+                onChange={() => toggleItem(item[itemKey])}
                 className='border-black focus:border-pink-600 outline-none focus:ring-1 focus:ring-pink-600 flex-none'
               />
               <span className="font-normal">{item.name}</span>

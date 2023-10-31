@@ -26,14 +26,16 @@ function App() {
       title: "Categories",
       selectedFilterItems: selectedCategories,
       onSelect: setSelectedCategories,
-      filterKey: "slug",
+      filterKey: "product_category",
+      itemKey: "slug",
       filterItems: categories
     },
     {
       title: "Customers",
       selectedFilterItems: selectedCustomers,
       onSelect: setSelectedCustomers,
-      filterKey: "slug",
+      filterKey: "customer_type",
+      itemKey: "slug",
       filterItems: customers
     }
   ];  
@@ -55,25 +57,25 @@ function App() {
   
     const matchesSearchTerm = (str) => regex.test(str.toLowerCase());
   
-    const productMatchesSearch = (product) => {
-      // Check if the product title, excerpt, or content matches the search term
+    const providerMatchesSearch = (provider) => {
+      // Check if the provider title, excerpt, or content matches the search term
       if (
-        matchesSearchTerm(product.post.post_title) ||
-        matchesSearchTerm(product.post.post_excerpt) ||
-        matchesSearchTerm(product.post.post_content)
+        matchesSearchTerm(provider.post.post_title) ||
+        matchesSearchTerm(provider.post.post_excerpt) ||
+        matchesSearchTerm(provider.post.post_content)
       ) {
         return true;
       }
   
-      // Check if any of the product's categories/customers match the search term
-      const categoryMatches = product.categories.some((category) => matchesSearchTerm(category.name));
-      const customerMatches = product.customers.some((customer) => matchesSearchTerm(customer.name));
+      // Check if any of the provider's categories/customers match the search term
+      const categoryMatches = provider.categories.some((category) => matchesSearchTerm(category.name));
+      const customerMatches = provider.customers.some((customer) => matchesSearchTerm(customer.name));
   
       return categoryMatches || customerMatches;
     };
   
-    // Filter products based on the search criteria
-    const filtered = providers.filter(productMatchesSearch);
+    // Filter providers based on the search criteria
+    const filtered = providers.filter(providerMatchesSearch);
   
     // Update the state
     setFilteredProviders(filtered);
