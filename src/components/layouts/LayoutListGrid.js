@@ -8,11 +8,10 @@ import './LayoutListGrid.css';
 
 function LayoutListGrid({ itemsName, items, filterGroups, currentFilter }) {
   const [layout, setLayout] = useState(window.innerWidth < 768 ? 'list' : 'grid');
-  const [searchTerm] = useState('');
   const itemRefs = React.useRef({});
 
   const filteredItems = useMemo(() => {
-    console.log("Current Filter:", currentFilter);
+    //console.log("Current Filter:", currentFilter);
 
     /* Don't just check for empty currentFilter;
     check whether filter actually has items with values. */
@@ -23,7 +22,7 @@ function LayoutListGrid({ itemsName, items, filterGroups, currentFilter }) {
     }
 
     return items.filter((item) => {
-      console.log("Inspecting Item:", item);
+      //console.log("Inspecting Item:", item);
 
       let isItemMatched = false; // flag to determine if item matches any filter
   
@@ -36,10 +35,10 @@ function LayoutListGrid({ itemsName, items, filterGroups, currentFilter }) {
   
         // For array attributes, loop through each element
         if (Array.isArray(item[filterKey])) {
-          console.log("Item attribute is array:", item[filterKey]);
+          //console.log("Item attribute is array:", item[filterKey]);
 
           const matchesAnyInArray = item[filterKey].some(element => {
-            console.log("Matched in array:", element);
+            //console.log("Matched in array:", element);
 
             return selectedFilterItems.includes(element[itemKey]);
           });
@@ -53,16 +52,16 @@ function LayoutListGrid({ itemsName, items, filterGroups, currentFilter }) {
           let itemValue = item[filterKey][itemKey];
           itemValue = itemValue.replace(/^"|"$/g, '');
 
-          console.log("Original Item Value:", itemValue);
+          //console.log("Original Item Value:", itemValue);
 
           if (!isNaN(itemValue) && typeof selectedFilterItems[0] === 'number') {
               itemValue = parseFloat(itemValue);
           }
 
-          console.log("Parsed Item Value:", itemValue);
+          //console.log("Parsed Item Value:", itemValue);
 
           if (selectedFilterItems.includes(itemValue)) {
-              console.log("Item matched:", item);
+              //console.log("Item matched:", item);
 
               isItemMatched = true;
               break; // Break out of the loop as soon as a match is found
@@ -78,7 +77,7 @@ function LayoutListGrid({ itemsName, items, filterGroups, currentFilter }) {
     });
   }, [items, currentFilter]);
 
-  console.log("Filtered Items Count:", filteredItems.length);
+  //console.log("Filtered Items Count:", filteredItems.length);
   
   // Directly initialize the refs for the current set of filtered items, i.e. all of em
   filteredItems.forEach(item => {
@@ -91,8 +90,6 @@ function LayoutListGrid({ itemsName, items, filterGroups, currentFilter }) {
     const handleViewportChange = debounce(() => {
       if (window.innerWidth < 768) {
           setLayout('list');
-      } else {
-          setLayout('grid');
       }
     }, 250); // Debounce time in milliseconds
 

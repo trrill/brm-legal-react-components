@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import LayoutListGrid from '../../components/layouts/LayoutListGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 import './tailwind-output.css';
 import './App.css';
 
+// Law Firm Transparency Directory
 function App() {
   const [firms, setFirms] = useState([]);
   const [filteredFirms, setFilteredFirms] = useState([]);
@@ -154,7 +155,7 @@ function App() {
 
   return (
     <div className="app bg-gray-100" id="legal-provider-directory">
-      <h1 className="uppercase text-5xl text-center p-4 pt-5 m-0 mb-4 border-b-2 border-pear">
+      <h1 className="uppercase text-4xl text-center p-4 pt-5 m-0 mb-4 border-b-2 border-pear">
         Law Firm Transparency
       </h1>
       <div className="md:flex mx-auto">

@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { stringToReactKey } from '../../utils/utils';
 
 function FilterGroup({
@@ -56,7 +56,7 @@ function FilterGroup({
         {filterItems && filterItems.map((item, index) => (
           <li key={ `filter-${stringToReactKey(item.name)}-${index}` } className={index !== filterItems.length - 1 ? "mb-2" : ""}>
             
-            <label className='cursor-pointer text-gray-800 flex items-center gap-2'>
+            <label className='cursor-pointer text-gray-800 leading-tight flex items-center gap-2'>
               <input
                 type="checkbox"
                 checked={selectedFilterItems && selectedFilterItems.includes(item[itemKey])}

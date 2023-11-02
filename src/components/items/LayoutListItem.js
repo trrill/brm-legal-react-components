@@ -54,7 +54,7 @@ const LayoutListItem = React.forwardRef(({ item, layout }, ref) => {
                 </h2>
                 <ItemDescription content={description} />
             </div>
-            <div className={`flex w-full items-center text-center ${layout === 'list' ? 'w-1/5 self-stretch items-center flex-none' : ''}`}>
+            <div className={`flex items-center text-center ${layout === 'list' ? 'w-1/5 self-stretch items-center flex-none' : 'w-full'}`}>
                 <a 
                     href={link} 
                     title={`Learn more about ${title}`}
