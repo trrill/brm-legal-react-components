@@ -1,0 +1,2 @@
+export const SET_SEARCH_TERM = 'SET_SEARCH_TERM';
+export const PERFORM_SEARCH = 'PERFORM_SEARCH';

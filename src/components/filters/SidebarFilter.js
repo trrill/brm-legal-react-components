@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import './SidebarFilter.css';
+import { useSelector, useDispatch } from 'react-redux';
+import { setSearchTerm, performSearch } from '../../redux/actions';
+
 import FilterGroup from './FilterGroup';
 import { ReactComponent as FilterIcon } from '../../assets/svg/tune_FILL0_wght400_GRAD0_opsz24.svg';
 import { ReactComponent as SearchIcon } from '../../assets/svg/search_FILL0_wght400_GRAD0_opsz24.svg';
@@ -7,11 +9,11 @@ import { ReactComponent as SearchIcon } from '../../assets/svg/search_FILL0_wght
 function SidebarFilter({
   filterGroups,
   currentFilter,
-  setCurrentFilter,
-  onSearch
+  setCurrentFilter
 }) {
+  const dispatch = useDispatch();
+  const searchTerm = useSelector(state => state.search.searchTerm);
 
-  const [searchTerm, setSearchTerm] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMoreFilterActive, setIsMoreFilterActive] = useState(false);
 
@@ -28,10 +30,8 @@ function SidebarFilter({
   };
 
   const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-
-    // Call the search function with the updated search term
-    onSearch(event.target.value);
+    dispatch(setSearchTerm(event.target.value) );
+    dispatch(performSearch(event.target.value));
   };
 
   useEffect(() => {
@@ -76,15 +76,17 @@ function SidebarFilter({
 
           {searchTerm && ( // Show the "X" icon only if searchTerm has a value
             <button
-              className="absolute top-50 transform -translate-y-50 right-2 cursor-pointer text-3xl text-gray-400 hover:text-black p-1"
-              onClick={() => {
-                setSearchTerm(''); // Clear the search term
-                onSearch(''); // Update filtered results
-              }} 
-              aria-label="Clear search"
-            >
-              &times;
-            </button>
+            className="absolute top-50 transform -translate-y-50 right-2 cursor-pointer text-3xl text-gray-400 hover:text-black p-1"
+            onClick={() => {
+              // Dispatch the setSearchTerm action with an empty string to clear the search term
+              dispatch(setSearchTerm(''));
+              // If you want to update the filtered results right away, dispatch the performSearch action
+              dispatch(performSearch(''));
+            }} 
+            aria-label="Clear search"
+          >
+            &times;
+          </button>
           )}
         </div>
         <div

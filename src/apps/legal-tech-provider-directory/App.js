@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import {performSearch} from '../../redux/actions';
 import LayoutListGrid from '../../components/layouts/LayoutListGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 import './tailwind-output.css';
 import './App.css';
 
 function App() {
+  const dispatch = useDispatch();
+
   const [providers, setProviders] = useState([]);
-  const [filteredProviders, setFilteredProviders] = useState([]);
+  const filteredProviders = useSelector(state => state.searchReducer.searchResults);
+
   const [currentFilter, setCurrentFilter] = useState({});
   const [categories, setCategories] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -52,7 +57,7 @@ function App() {
     }
   }, [apiBasePoint]);
 
-  const handleSearch = (searchTerm) => {
+  const providersSearch = (searchTerm) => {
     const regex = new RegExp(searchTerm.toLowerCase());
   
     const matchesSearchTerm = (str) => regex.test(str.toLowerCase());
@@ -73,12 +78,12 @@ function App() {
   
       return categoryMatches || customerMatches;
     };
-  
-    // Filter providers based on the search criteria
-    const filtered = providers.filter(providerMatchesSearch);
-  
-    // Update the state
-    setFilteredProviders(filtered);
+
+    return providers.filter(providerMatchesSearch);
+  };
+
+  const handleSearch = (searchTerm) => {
+    dispatch(performSearch(searchTerm, providersSearch));
   };
   
   useEffect(() => {
@@ -99,7 +104,7 @@ function App() {
             }
 
             setProviders(dataArray);
-            setFilteredProviders(dataArray);
+            //setFilteredProviders(dataArray);
         } catch (error) {
             console.error("Error fetching data: ", error);
         } finally {
@@ -124,10 +129,10 @@ function App() {
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter} 
           onSearch={handleSearch}
-        />
+        /> 
         <LayoutListGrid 
           itemsName="Providers"
-          items={filteredProviders} 
+          //items={filteredProviders} 
           currentFilter={currentFilter} 
         />
       </div>

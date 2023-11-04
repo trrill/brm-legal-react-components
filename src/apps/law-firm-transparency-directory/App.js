@@ -93,7 +93,6 @@ function App() {
   const fetchedFirmsRef = useRef(false);
 
   const handleSearch = (searchTerm) => {
-    //console.log('searchTerm: ', searchTerm);
     const regex = new RegExp(searchTerm.toLowerCase());
   
     const matchesSearchTerm = (str) => regex.test(str.toLowerCase());
@@ -126,7 +125,6 @@ function App() {
     const fetchFirms = async () => {
       //setLoading(true);
       try {
-        //console.log('Fetching firms...');
         const apiUrl = `${apiBasePoint}/wp-json/custom/v1/transparency_firms_data`;
         const response = await fetch(apiUrl);
         const data = await response.json();
