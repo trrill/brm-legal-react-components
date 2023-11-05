@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchLegalProvidersStart, fetchLegalProvidersSuccess, setFilteredLegalProviders, performSearch } from '../../redux/actions';
+import { performSearch } from '../../redux/actions';
+import { fetchLegalProvidersStart, fetchLegalProvidersSuccess, setFilteredLegalProviders } from '../../redux/actionsLegalProviders';
 import LayoutListGrid from '../../components/layouts/LayoutListGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 import './tailwind-output.css';
