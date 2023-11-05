@@ -114,7 +114,7 @@ function App() {
       return bonusCategoryMatches || salaryScaleMatches;
     };
   
-    // Filter providers based on the search criteria
+    // Filter legalProviders based on the search criteria
     const filtered = firms.filter(firmMatchesSearch);
   
     // Update the state

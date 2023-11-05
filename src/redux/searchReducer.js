@@ -1,9 +1,8 @@
-// searchReducer.js
 import { SET_SEARCH_TERM, PERFORM_SEARCH } from './types';
 
 const initialState = {
   searchTerm: '',
-  searchResults: [],
+  searchResults: [], 
 };
 
 const searchReducer = (state = initialState, action) => {
@@ -14,10 +13,14 @@ const searchReducer = (state = initialState, action) => {
         searchTerm: action.payload,
       };
     case PERFORM_SEARCH:
-      // Here you would add your logic to perform the search based on searchTerm
+      const { searchTerm, searchFunction } = action.payload;
+
+      // Execute the provided search function with the searchTerm
+      const searchResults = searchFunction(searchTerm);
+
       return {
         ...state,
-        searchResults: [], // Replace with actual search results
+        searchResults: searchResults,
       };
     default:
       return state;
