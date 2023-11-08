@@ -30,10 +30,6 @@ function FilterGroup({
     }));
   }  
 
-  /* useEffect(() => {
-    console.log('currentFilter (updated): ', currentFilter);
-  }, [currentFilter]);  */
-
   return (
     <div id={`filter-${title}`}>
       <div className='flex items-center justify-between py-2'>
