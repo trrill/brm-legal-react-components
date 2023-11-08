@@ -1,13 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { performSearch } from '../../redux/actions';
+import { fetchTransparencyFirmsStart, fetchTransparencyFirmsSuccess, fetchTransparencyFirmsFailure, setFilteredTransparencyFirms } from '../../redux/actionsTransparencyFirms';
 import LayoutListGrid from '../../components/layouts/LayoutListGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 import './tailwind-output.css';
 import './App.css';
+import { fetchLegalProvidersStart } from '../../redux/actionsLegalProviders';
 
 // Law Firm Transparency Directory
 function App() {
-  const [firms, setFirms] = useState([]);
-  const [filteredFirms, setFilteredFirms] = useState([]);
+  const dispatch = useDispatch();
+
+  const isFetching = useSelector(state => state.transparencyFirms.isFetching);
+  const transparencyFirms = useSelector(state => state.transparencyFirms.transparencyFirms);
+  const filteredTransparencyFirms = useSelector(state => state.transparencyFirms.filteredTransparencyFirms);
+
   const [currentFilter, setCurrentFilter] = useState({});
   const [selectedBonusCategories, setSelectedBonusCategories] = useState([]);
   const [selectedSalaryScales, setSelectedSalaryScales] = useState([]);
@@ -93,7 +101,6 @@ function App() {
   const fetchedFirmsRef = useRef(false);
 
   const handleSearch = (searchTerm) => {
-    //console.log('searchTerm: ', searchTerm);
     const regex = new RegExp(searchTerm.toLowerCase());
   
     const matchesSearchTerm = (str) => regex.test(str.toLowerCase());
@@ -115,18 +122,18 @@ function App() {
       return bonusCategoryMatches || salaryScaleMatches;
     };
   
-    // Filter providers based on the search criteria
-    const filtered = firms.filter(firmMatchesSearch);
+    // Filter legalProviders based on the search criteria
+    const filtered = transparencyFirms.filter(firmMatchesSearch);
   
     // Update the state
-    setFilteredFirms(filtered);
+    dispatch(setFilteredTransparencyFirms(filtered));
   };
 
   useEffect(() => {
     const fetchFirms = async () => {
-      //setLoading(true);
+      dispatch(fetchTransparencyFirmsStart());
+
       try {
-        //console.log('Fetching firms...');
         const apiUrl = `${apiBasePoint}/wp-json/custom/v1/transparency_firms_data`;
         const response = await fetch(apiUrl);
         const data = await response.json();
@@ -136,8 +143,8 @@ function App() {
           dataArray = Object.values(data);
         }
         
-        setFirms(dataArray);
-        setFilteredFirms(dataArray);
+        dispatch(fetchTransparencyFirmsSuccess(dataArray));
+        dispatch(setFilteredTransparencyFirms(dataArray));
 
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -151,7 +158,7 @@ function App() {
       fetchedFirmsRef.current = true;
     }
     
-  }, [firms, apiBasePoint]);
+  }, [transparencyFirms, apiBasePoint, dispatch]);
 
   return (
     <div className="app bg-gray-100" id="legal-provider-directory">
@@ -167,7 +174,7 @@ function App() {
         />
         <LayoutListGrid 
           itemsName="Firms"
-          items={filteredFirms} 
+          items={filteredTransparencyFirms}
           filterGroups={filterGroups} 
           currentFilter={currentFilter} 
         />
