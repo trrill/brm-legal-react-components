@@ -18,7 +18,7 @@
 	background: linear-gradient(to right,  #1e5799 0%,#ff1b6b 0%,#a172b5 50%,#6bc7f9 100%);
 }
 
-.product-item {
+.item-item {
 	transition: all 0.3s ease-in-out;
 }
 
@@ -26,16 +26,3 @@
 	font-family: proxima-nova, sans-serif;
 	min-height: 100vh;
 }
-
-.filter-sidebar input[type="checkbox"] {
-	appearance: none;
-	border-width: 1px;
-	border-style: solid;
-	width: 15px;
-	height: 15px;
-	transition: all 0.3s ease-in-out;
-}
-	.filter-sidebar input[type="checkbox"]:checked {
-		background-color: #ff1b6b;
-	}
-

@@ -680,8 +680,8 @@ video {
 .lowercase {
   text-transform: lowercase;
 }
-.leading-tight {
-  line-height: 1.25;
+.leading-snug {
+  line-height: 1.375;
 }
 .tracking-wider {
   letter-spacing: 0.05em;

@@ -6,10 +6,10 @@
 	fill: #000;
 }
 
-.product-listing.listing-layout-grid .product-item {
+.item-listing.listing-layout-grid .item-item {
 	width: calc(25% - 1rem)
 }
 
-.product-listing.listing-layout-grid .product-item-data {
+.item-listing.listing-layout-grid .item-item-data {
 	display: none;
-}	
+}

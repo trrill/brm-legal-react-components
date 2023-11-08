@@ -1,90 +1,174 @@
-import React, { useState, useEffect } from 'react';
-import ProductListing from '../../components/grids/ProductListing';
+import React, { useState, useEffect, useRef } from 'react';
+import LayoutListGrid from '../../components/layouts/LayoutListGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
-
+import './tailwind-output.css';
 import './App.css';
 
+// Law Firm Transparency Directory
 function App() {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]); // Initialize as an empty array
-  const [selectedCustomers, setSelectedCustomers] = useState([]); // Initialize as an empty array
-  //const [loading, setLoading] = useState(false);
-  
+  const [firms, setFirms] = useState([]);
+  const [filteredFirms, setFilteredFirms] = useState([]);
+  const [currentFilter, setCurrentFilter] = useState({});
+  const [selectedBonusCategories, setSelectedBonusCategories] = useState([]);
+  const [selectedSalaryScales, setSelectedSalaryScales] = useState([]);
 
-  const [currentFilter, setCurrentFilter] = useState({
-    categories: [],
-    customers: [],
-  });
+  const filterGroups = [
+    {
+      title: "Bonus Category",
+      note: "When the billable hours requirement is unknown or in excess of 2000 hours, bonuses are marked as Full Match.",
+      selectedFilterItems: selectedBonusCategories,
+      onSelect: setSelectedBonusCategories,
+      filterKey: "bonus_category",
+      itemKey: "value",
+      filterItems: [
+        {
+          id: "bonus_category_8",
+          name: "Market +",
+          slug: "market-plus",
+          value: 8
+        },
+        {
+          id: "bonus_category_5",
+          name: "Full Match < 2000 Hours Billable Requirement",
+          slug: "full-match-less-than-2000-hours-billable-requirement",
+          value: 5
+        },
+        {
+          id: "bonus_category_4",
+          name: "Full Match",
+          slug: "full-match",
+          value: 4
+        },
+        {
+          id: "bonus_category_3",
+          name: "Less Than Market",
+          slug: "less-than-market",
+          value: 2
+        },
+        {
+          id: "bonus_category_1",
+          name: "Black Box",
+          slug: "black-box",
+          value: 1
+        }
+
+      ]
+    },
+    {
+      title: "Salary Scale",
+      note: "Market salary is based on a $202,500-205,000 scale for first-year associates.",
+      selectedFilterItems: selectedSalaryScales,
+      onSelect: setSelectedSalaryScales,
+      filterKey: "salary_scale",
+      itemKey: "value",
+      filterItems: [
+        {
+          id: "salary_scale_4",
+          name: "Market +",
+          slug: "market-plus",
+          value: 4
+        },
+        {
+          id: "salary_scale_3",
+          name: "Market",
+          slug: "market",
+          value: 3
+        },
+        {
+          id: "salary_scale_2",
+          name: "Below Market",
+          slug: "below-market",
+          value: 2
+        },
+      ]
+    }
+  ];
+  
+  const isDevelopment = window.location.hostname === "dev.abovethelaw.com" || window.location.hostname === "localhost";
+
+  const apiBasePoint = isDevelopment 
+    ? 'http://dev.aldus.abovethelaw.com:3000/wp-api'
+    : 'https://aldus.abovethelaw.com:3000/wp-api';
+
+  const fetchedFirmsRef = useRef(false);
 
   const handleSearch = (searchTerm) => {
-    // Update the filteredProducts based on the search term
-
-    const filtered = products.filter((product) => {
-      // Check if the product title, excerpt, content, or categories/customers match the search term
-      return (
-        product.post.post_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.post.post_excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.post.post_content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.categories.some((category) =>
-          category.name.toLowerCase().includes(searchTerm.toLowerCase())
-        ) ||
-        product.customers.some((customer) =>
-          customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    });
-
-    // Set the filtered products in the state
-    setFilteredProducts(filtered);
+    //console.log('searchTerm: ', searchTerm);
+    const regex = new RegExp(searchTerm.toLowerCase());
+  
+    const matchesSearchTerm = (str) => regex.test(str.toLowerCase());
+  
+    const firmMatchesSearch = (firm) => {
+      // Check if the provider title, excerpt, or content matches the search term
+      if (
+        matchesSearchTerm(firm.post.post_title) ||
+        matchesSearchTerm(firm.post.post_excerpt) ||
+        matchesSearchTerm(firm.post.post_content)
+      ) {
+        return true;
+      }
+  
+      // Check if any of the firm's categories/customers match the search term
+      const bonusCategoryMatches = firm.bonus_category.some((category) => matchesSearchTerm(category.display));
+      const salaryScaleMatches = firm.salary_scale.some((customer) => matchesSearchTerm(customer.display));
+  
+      return bonusCategoryMatches || salaryScaleMatches;
+    };
+  
+    // Filter providers based on the search criteria
+    const filtered = firms.filter(firmMatchesSearch);
+  
+    // Update the state
+    setFilteredFirms(filtered);
   };
 
   useEffect(() => {
-    const fetchTransparencyFirms = async () => {
-      setLoading(true);
+    const fetchFirms = async () => {
+      //setLoading(true);
       try {
-        console.log('Fetching providers...');
-        const apiUrl = `${process.env.REACT_APP_ATL_BASE_URL}/wp-json/custom/v1/transparency_firms_with_terms`;
+        //console.log('Fetching firms...');
+        const apiUrl = `${apiBasePoint}/wp-json/custom/v1/transparency_firms_data`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        setProducts(data);
-        setFilteredProducts(data);
+        let dataArray = data;
+
+        if ( ! Array.isArray(data) ) {
+          dataArray = Object.values(data);
+        }
+        
+        setFirms(dataArray);
+        setFilteredFirms(dataArray);
+
       } catch (error) {
         console.error("Error fetching data: ", error);
       } finally {
-        setLoading(false);
+        //
       }
     };
 
-    if (products.length === 0) {
-      fetchTransparencyFirms();
+    if ( ! fetchedFirmsRef.current) {
+      fetchFirms();
+      fetchedFirmsRef.current = true;
     }
     
-    //fetchTopLevelTaxonomyTerms('product_category', setCategories);
-    //fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
-  }, [products, ]);
+  }, [firms, apiBasePoint]);
 
   return (
-    <div className="app" id="legal-provider-directory">
-      <h1 className="uppercase text-white text-mono text-5xl text-center p-4 pt-5 m-0 mb-4 gradient-title">
-        Legal Tech Directory
+    <div className="app bg-gray-100" id="legal-provider-directory">
+      <h1 className="uppercase text-4xl text-center p-4 pt-5 m-0 mb-4 border-b-2 border-pear">
+        Law Firm Transparency
       </h1>
       <div className="md:flex mx-auto">
         <SidebarFilter
-          categories={categories}
-          selectedCategories={selectedCategories}
-          onSelectCategories={setSelectedCategories}
-          customers={customers}
-          selectedCustomers={selectedCustomers}
-          onSelectCustomers={setSelectedCustomers}
+          filterGroups={filterGroups}
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter} 
           onSearch={handleSearch}
         />
-        <ProductListing 
-          products={filteredProducts} 
+        <LayoutListGrid 
+          itemsName="Firms"
+          items={filteredFirms} 
+          filterGroups={filterGroups} 
           currentFilter={currentFilter} 
         />
       </div>

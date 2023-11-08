@@ -8,6 +8,7 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "autoprefixer": "^10.4.16",
+    "dompurify": "^3.0.6",
     "postcss": "^8.4.31",
     "postcss-cli": "^10.1.0",
     "react": "^18.2.0",
@@ -20,9 +21,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start:providers": "react-scripts start src/apps/legal-tech-provider-directory/index.js",
     "build:providers-css": "postcss src/apps/legal-tech-provider-directory/tailwind.css -o src/apps/legal-tech-provider-directory/tailwind-output.css",
-    "build:providers": "react-scripts build src/apps/legal-tech-provider-directory/index.js && mv build/static/js/main.*.js build/static/js/legalTechProviderDirectory.js && mv build/static/css/main.*.css build/static/css/legalTechProviderDirectory.css"
+    "start:providers": "npm run build:providers-css && react-scripts start src/apps/legal-tech-provider-directory/index.js",
+    "build:providers": "npm run build:providers-css && react-scripts build src/apps/legal-tech-provider-directory/index.js && mv build/static/js/main.*.js build/static/js/legalTechProviderDirectory.js && mv build/static/css/main.*.css build/static/css/legalTechProviderDirectory.css",
+    "build:transparency-css": "postcss src/apps/law-firm-transparency-directory/tailwind.css -o src/apps/law-firm-transparency-directory/tailwind-output.css",
+    "start:transparency": "npm run build:transparency-css && react-scripts start src/apps/law-firm-transparency-directory/index.js",
+    "build:transparency": "npm run build:transparency-css && react-scripts build src/apps/law-firm-transparency-directory/index.js && mv build/static/js/main.*.js build/static/js/lawFirmTransparencyDirectory.js && mv build/static/css/main.*.css build/static/css/lawFirmTransparencyDirectory.css"
   },
   "eslintConfig": {
     "extends": [

@@ -1,30 +1,44 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import ProductListing from '../../components/grids/ProductListing';
+import LayoutListGrid from '../../components/layouts/LayoutListGrid';
 import SidebarFilter from '../../components/filters/SidebarFilter';
 import './tailwind-output.css';
 import './App.css';
 
 function App() {
-  const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [providers, setProviders] = useState([]);
+  const [filteredProviders, setFilteredProviders] = useState([]);
+  const [currentFilter, setCurrentFilter] = useState({});
   const [categories, setCategories] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedCustomers, setSelectedCustomers] = useState([]);
-  //const [loading, setLoading] = useState(false);
-  
-  const [currentFilter, setCurrentFilter] = useState({
-    categories: [],
-    customers: [],
-  });
 
   const isDevelopment = window.location.hostname === "dev.abovethelaw.com" || window.location.hostname === "localhost";
 
   const apiBasePoint = isDevelopment 
-    ? 'http://dev.abovethelaw.com/legal-innovation-center'
-    : 'https://abovethelaw.com/legal-innovation-center';
+  ? 'http://dev.aldus.abovethelaw.com:3000/wp-api/legal-innovation-center'
+  : 'https://aldus.abovethelaw.com:3000/wp-api/legal-innovation-center';  
 
-  const fetchedProductsRef = useRef(false);
+  const fetchedProvidersRef = useRef(false);
+
+  const filterGroups = [
+    {
+      title: "Categories",
+      selectedFilterItems: selectedCategories,
+      onSelect: setSelectedCategories,
+      filterKey: "product_category",
+      itemKey: "slug",
+      filterItems: categories
+    },
+    {
+      title: "Customers",
+      selectedFilterItems: selectedCustomers,
+      onSelect: setSelectedCustomers,
+      filterKey: "customer_type",
+      itemKey: "slug",
+      filterItems: customers
+    }
+  ];  
 
   const fetchTopLevelTaxonomyTerms = useCallback(async (taxonomyType, stateSetter) => {
     try {
@@ -32,61 +46,72 @@ function App() {
       const response = await fetch(url);
       const data = await response.json();
       stateSetter(data);
+
     } catch (error) {
       console.error(`Error fetching ${taxonomyType}: `, error);
     }
   }, [apiBasePoint]);
 
   const handleSearch = (searchTerm) => {
-    // Update the filteredProducts based on the search term
-
-    const filtered = products.filter((product) => {
-      // Check if the product title, excerpt, content, or categories/customers match the search term
-      return (
-        product.post.post_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.post.post_excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.post.post_content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.categories.some((category) =>
-          category.name.toLowerCase().includes(searchTerm.toLowerCase())
-        ) ||
-        product.customers.some((customer) =>
-          customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    });
-
-    // Set the filtered products in the state
-    setFilteredProducts(filtered);
-  };
-
-  useEffect(() => {
-    const fetchProviders = async () => {
-      //setLoading(true);
-      try {
-        console.log('Fetching providers...');
-        const apiUrl = `${apiBasePoint}/wp-json/custom/v1/providers_with_terms`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        setProducts(data);
-        setFilteredProducts(data);
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      } finally {
-        //setLoading(false);
+    const regex = new RegExp(searchTerm.toLowerCase());
+  
+    const matchesSearchTerm = (str) => regex.test(str.toLowerCase());
+  
+    const providerMatchesSearch = (provider) => {
+      // Check if the provider title, excerpt, or content matches the search term
+      if (
+        matchesSearchTerm(provider.post.post_title) ||
+        matchesSearchTerm(provider.post.post_excerpt) ||
+        matchesSearchTerm(provider.post.post_content)
+      ) {
+        return true;
       }
+  
+      // Check if any of the provider's categories/customers match the search term
+      const categoryMatches = provider.categories.some((category) => matchesSearchTerm(category.name));
+      const customerMatches = provider.customers.some((customer) => matchesSearchTerm(customer.name));
+  
+      return categoryMatches || customerMatches;
+    };
+  
+    // Filter providers based on the search criteria
+    const filtered = providers.filter(providerMatchesSearch);
+  
+    // Update the state
+    setFilteredProviders(filtered);
+  };
+  
+  useEffect(() => {
+    const fetchData = async () => {
+        try {
+            
+            await fetchTopLevelTaxonomyTerms('product_category', setCategories);
+            await fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
+
+            // Once both taxonomy terms have been fetched, fetch the providers
+            const apiUrl = `${apiBasePoint}/wp-json/custom/v1/providers_with_terms`;
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            let dataArray = data;
+            
+            if (!Array.isArray(data)) {
+                dataArray = Object.values(data);
+            }
+
+            setProviders(dataArray);
+            setFilteredProviders(dataArray);
+        } catch (error) {
+            console.error("Error fetching data: ", error);
+        } finally {
+            // setLoading(false);
+        }
     };
 
-    if ( ! fetchedProductsRef.current) {
-      fetchProviders();
-      fetchedProductsRef.current = true;
+    if (!fetchedProvidersRef.current) {
+        fetchData();
+        fetchedProvidersRef.current = true;
     }
-    
-  }, [products, apiBasePoint]);
-
-  useEffect(() => {
-    fetchTopLevelTaxonomyTerms('product_category', setCategories);
-    fetchTopLevelTaxonomyTerms('customer_type', setCustomers);
-  }, [fetchTopLevelTaxonomyTerms]);
+}, [fetchTopLevelTaxonomyTerms, apiBasePoint]);
 
   return (
     <div className="app bg-gray-100" id="legal-provider-directory">
@@ -95,18 +120,14 @@ function App() {
       </h1>
       <div className="md:flex mx-auto">
         <SidebarFilter
-          categories={categories}
-          selectedCategories={selectedCategories}
-          onSelectCategories={setSelectedCategories}
-          customers={customers}
-          selectedCustomers={selectedCustomers}
-          onSelectCustomers={setSelectedCustomers}
+          filterGroups={filterGroups}
           currentFilter={currentFilter}
           setCurrentFilter={setCurrentFilter} 
           onSearch={handleSearch}
         />
-        <ProductListing 
-          products={filteredProducts} 
+        <LayoutListGrid 
+          itemsName="Providers"
+          items={filteredProviders} 
           currentFilter={currentFilter} 
         />
       </div>

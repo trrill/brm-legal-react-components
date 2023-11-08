@@ -1,22 +1,22 @@
 /* Enter transition */
-.product-item-transition-enter {
+.item-item-transition-enter {
 	opacity: 0.01;
 	transform: scale(0.9);
 }
 
-.product-item-transition-enter-active {
+.item-item-transition-enter-active {
 	opacity: 1;
 	transform: scale(1);
 	transition: opacity 500ms ease-in-out, transform 500ms ease-in-out;
 }
 
 /* Exit transition */
-.product-item-transition-exit {
+.item-item-transition-exit {
 	opacity: 1;
 	transform: scale(1);
 }
 
-.product-item-transition-exit-active {
+.item-item-transition-exit-active {
 	opacity: 0.01;
 	transform: scale(0.9);
 	transition: opacity 500ms ease-in-out, transform 500ms ease-in-out;
