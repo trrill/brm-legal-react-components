@@ -21,12 +21,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "build:providers-css": "postcss src/apps/legal-tech-provider-directory/tailwind.css -o src/apps/legal-tech-provider-directory/tailwind-output.css",
-    "start:providers": "npm run build:providers-css && react-scripts start src/apps/legal-tech-provider-directory/index.js",
-    "build:providers": "npm run build:providers-css && react-scripts build src/apps/legal-tech-provider-directory/index.js && mv build/static/js/main.*.js build/static/js/legalTechProviderDirectory.js && mv build/static/css/main.*.css build/static/css/legalTechProviderDirectory.css",
-    "build:transparency-css": "postcss src/apps/law-firm-transparency-directory/tailwind.css -o src/apps/law-firm-transparency-directory/tailwind-output.css",
-    "start:transparency": "npm run build:transparency-css && react-scripts start src/apps/law-firm-transparency-directory/index.js",
-    "build:transparency": "npm run build:transparency-css && react-scripts build src/apps/law-firm-transparency-directory/index.js && mv build/static/js/main.*.js build/static/js/lawFirmTransparencyDirectory.js && mv build/static/css/main.*.css build/static/css/lawFirmTransparencyDirectory.css"
+    "build-css:providers": "postcss src/apps/legal-tech-provider-directory/tailwind.css -o src/apps/legal-tech-provider-directory/tailwind-output.css",
+    "start:providers": "npm run build-css:providers && react-scripts start src/apps/legal-tech-provider-directory/index.js",
+    "build:providers": "npm run build-css:providers && react-scripts build src/apps/legal-tech-provider-directory/index.js && mv build/static/js/main.*.js build/static/js/legalTechProviderDirectory.js && mv build/static/css/main.*.css build/static/css/legalTechProviderDirectory.css",
+    "build-css:transparency": "postcss src/apps/law-firm-transparency-directory/tailwind.css -o src/apps/law-firm-transparency-directory/tailwind-output.css",
+    "start:transparency": "npm run build-css:transparency && react-scripts start src/apps/law-firm-transparency-directory/index.js",
+    "build:transparency": "npm run build-css:transparency && react-scripts build src/apps/law-firm-transparency-directory/index.js && mv build/static/js/main.*.js build/static/js/lawFirmTransparencyDirectory.js && mv build/static/css/main.*.css build/static/css/lawFirmTransparencyDirectory.css"
   },
   "eslintConfig": {
     "extends": [
